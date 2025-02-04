@@ -193,17 +193,17 @@ return { -- LSP Configuration & Plugins
 		--  You can press `g?` for help in this menu.
 		require("mason").setup({
 			PATH = "skip",
-		  
+
 			ui = {
-			  icons = {
-				package_pending = " ",
-				package_installed = " ",
-				package_uninstalled = " ",
-			  },
+				icons = {
+					package_pending = " ",
+					package_installed = " ",
+					package_uninstalled = " ",
+				},
 			},
-		  
+
 			max_concurrent_installers = 10,
-		  })
+		})
 
 		-- You can add other tools here that you want Mason to install
 		-- for you, so that they are available from within Neovim.

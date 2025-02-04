@@ -47,33 +47,32 @@ return { -- Fuzzy Finder (files, lsp, etc)
 		-- See `:help telescope` and `:help telescope.setup()`
 		require("telescope").setup({
 			defaults = {
-				prompt_prefix = '   ',
-				selection_caret = '  ',
-				entry_prefix = '   ',
-				path_display = { 'truncate' },
+				prompt_prefix = "   ",
+				selection_caret = "  ",
+				entry_prefix = "   ",
+				path_display = { "truncate" },
 				file_ignore_patterns = {
-					'dist',
-					'target',
-					'node_modules',
-					'pack/plugins',
+					"dist",
+					"target",
+					"node_modules",
+					"pack/plugins",
 				},
+
 				sorting_strategy = "ascending",
 				layout_config = {
-				  horizontal = {
-					prompt_position = "top",
-					preview_width = 0.55,
-				  },
-				  width = 0.87,
-				  height = 0.80,
+					horizontal = {
+						prompt_position = "top",
+						preview_width = 0.55,
+					},
+					width = 0.87,
+					height = 0.80,
 				},
 				mappings = {
-				  n = { ["q"] = require("telescope.actions").close },
+					n = { ["q"] = require("telescope.actions").close },
 				},
-			  },
-			
+			},
+
 			--   extensions_list = { "themes", "terms" },
-		 
-		
 		})
 
 		-- Enable Telescope extensions if they are installed
@@ -99,7 +98,6 @@ return { -- Fuzzy Finder (files, lsp, etc)
 			builtin.current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
 				winblend = 10,
 				previewer = false,
-				
 			}))
 		end, { desc = "[/] Fuzzily search in current buffer" })
 

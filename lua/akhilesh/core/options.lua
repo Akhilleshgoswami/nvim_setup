@@ -60,7 +60,7 @@ vim.api.nvim_create_autocmd({ "ColorScheme" }, {
 		vim.api.nvim_set_hl(0, "TelescopeNormal", { bg = "none" })
 		-- Set up Telescope transparency
 		vim.api.nvim_set_hl(0, "TelescopeNormal", { bg = "none" })
-
 	end,
 })
+vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
 
