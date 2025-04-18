@@ -8,21 +8,21 @@ keymap.set("n", "<leader>pv", vim.cmd.Ex)
 
 keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 keymap.set("v", "K", ":m '<-2<CR>gv=gv")
-
 keymap.set("n", "J", "mzJ`z")
+
 keymap.set("n", "<C-d>", "<C-d>zz")
 keymap.set("n", "<C-u>", "<C-u>zz")
 keymap.set("n", "n", "nzzzv")
 keymap.set("n", "N", "Nzzzv")
 keymap.set("n", "<leader>zig", "<cmd>LspRestart<cr>")
-
-keymap.set("n", "<leader>vwm", function()
-	require("vim-with-me").StartVimWithMe()
-end)
-keymap.set("n", "<leader>svwm", function()
-	require("vim-with-me").StopVimWithMe()
-end)
-
+--
+-- keymap.set("n", "<leader>vwm", function()
+-- 	require("vim-with-me").StartVimWithMe()
+-- end)
+-- keymap.set("n", "<leader>svwm", function()
+-- 	require("vim-with-me").StopVimWithMe()
+-- end)
+--
 -- greatest remap ever
 keymap.set("x", "<leader>p", [["_dP]])
 
@@ -60,3 +60,10 @@ local opts = { noremap = true, silent = true }
 map("n", "<tab>", "<Cmd>BufferPrevious<CR>", opts)
 map("n", "<S-tab>", "<Cmd>BufferNext<CR>", opts)
 map("n", "<S-C>", "<Cmd>BufferClose<CR>", opts)
+-- vim.api.nvim_set_keymap("n", ":", "<cmd>FineCmdline<CR>", { noremap = true })
+vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+vim.cmd("highlight! HarpoonInactive guibg=NONE guifg=#63698c")
+vim.cmd("highlight! HarpoonActive guibg=NONE guifg=white")
+vim.cmd("highlight! HarpoonNumberActive guibg=NONE guifg=#7aa2f7")
+vim.cmd("highlight! HarpoonNumberInactive guibg=NONE guifg=#7aa2f7")
+vim.cmd("highlight! TabLineFill guibg=NONE guifg=white")

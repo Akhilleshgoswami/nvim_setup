@@ -6,7 +6,6 @@ return {
 
 		substitute.setup()
 
-		-- set keymaps
 		local keymap = vim.keymap -- for conciseness
 
 		keymap.set("n", "s", substitute.operator, { desc = "Substitute with motion" })

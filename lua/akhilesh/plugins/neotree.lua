@@ -11,7 +11,7 @@ return {
 	cmd = "Neotree",
 	keys = {
 		{ "<C-o>", ":Neotree reveal<CR>", { desc = "NeoTree reveal" } },
-		{ "<C-t>", ":Neotree close<CR>", { desc = "NeoTree close" } },
+		{ "<C-q>", ":Neotree close<CR>", { desc = "NeoTree close" } },
 		-- Added command to close NeoTree
 	},
 	config = function()
@@ -47,7 +47,5 @@ return {
 				},
 			},
 		})
-		
 	end,
 }
-
