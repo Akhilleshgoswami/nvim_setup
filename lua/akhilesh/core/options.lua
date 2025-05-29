@@ -3,9 +3,9 @@ vim.opt.guicursor = ""
 vim.opt.nu = true
 vim.opt.relativenumber = true
 
-vim.opt.tabstop = 4
-vim.opt.softtabstop = 4
-vim.opt.shiftwidth = 4
+vim.opt.tabstop = 1 -- Number of spaces a tab counts for
+vim.opt.softtabstop = 1 -- Number of spaces Neovim uses when you press <Tab>
+vim.opt.shiftwidth = 1 -- Number of spaces to use for each indentation level
 vim.opt.expandtab = true
 
 vim.opt.smartindent = true
