@@ -68,3 +68,7 @@ vim.cmd("highlight! HarpoonNumberActive guibg=NONE guifg=#7aa2f7")
 vim.cmd("highlight! HarpoonNumberInactive guibg=NONE guifg=#7aa2f7")
 vim.cmd("highlight! TabLineFill guibg=NONE guifg=white")
 
+vim.keymap.set("n", "<leader>gd", ":DiffviewOpen<CR>", { desc = "Open Git Diff" })
+vim.keymap.set("n", "<leader>gc", ":DiffviewClose<CR>", { desc = "Close Git Diff" })
+
+vim.keymap.set("n", "<leader>q", ":DiffviewToggleFiles<CR>", { desc = "Close Toggle File Git" })

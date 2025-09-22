@@ -15,10 +15,11 @@ return {
 		notify_on_error = false,
 		format_on_save = false, -- Disable auto-format on save
 		formatters_by_ft = {
-			typescript = { "prettier" },
-			javascriptreact = { "prettier" },
-			typescriptreact = { "prettier" },
-   go={"gofmt"}
+			typescript = { "prettiered" },
+			javascriptreact = { "prettiered" },
+			typescriptreact = { "prettiered" },
+   go={"gofmt"},
+   solidity = {"prettiered"}
 			-- Add other filetypes as needed
 		},
 		-- Prettier-specific settings for consistent indentation

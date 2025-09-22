@@ -2,6 +2,7 @@ return {
   "hrsh7th/nvim-cmp",
   event = "InsertEnter",
   dependencies = {
+    -- LuaSnip
     {
       "L3MON4D3/LuaSnip",
       build = (function()
@@ -11,12 +12,35 @@ return {
         return "make install_jsregexp"
       end)(),
     },
-    "saadparwaiz1/cmp_luasnip",
-    "onsails/lspkind.nvim",
-    "hrsh7th/cmp-nvim-lsp",
-    "hrsh7th/cmp-path",
-    "mlaursen/vim-react-snippets",
-    { "tzachar/cmp-tabnine", build = "./install.sh", dependencies = { "hrsh7th/nvim-cmp" } },
+    "saadparwaiz1/cmp_luasnip",  -- LuaSnip integration for nvim-cmp
+    "onsails/lspkind.nvim",      -- LSP kind for iconography
+    "hrsh7th/cmp-nvim-lsp",     -- LSP completion source
+    "hrsh7th/cmp-path",         -- Path completion source
+    "mlaursen/vim-react-snippets",  -- React snippets
+    { 
+      "tzachar/cmp-tabnine",    -- Tabnine integration
+      build = "./install.sh", 
+      dependencies = { "hrsh7th/nvim-cmp" } 
+    },
+    {
+      "zbirenbaum/copilot-cmp", -- Copilot integration for nvim-cmp
+      event = "InsertEnter",
+      config = function()
+        require("copilot_cmp").setup()  -- Setup copilot-cmp
+      end,
+      dependencies = {
+        {
+          "zbirenbaum/copilot.lua", -- GitHub Copilot plugin
+          cmd = "Copilot",  -- Copilot will only load when the Copilot command is called
+          config = function()
+            require("copilot").setup({
+              suggestion = { enabled = true },  -- Enable suggestion popup for Copilot
+              panel = { enabled = true },       -- Enable the Copilot panel
+            })
+          end,
+        },
+      },
+    },
   },
   config = function()
     local cmp = require("cmp")
@@ -24,9 +48,11 @@ return {
     local lspkind = require("lspkind")
     local tabnine = require("cmp_tabnine.config")
 
+    -- Set up LuaSnip
     luasnip.config.setup({})
     require("vim-react-snippets").lazy_load()
 
+    -- Set up Tabnine
     tabnine:setup({
       max_lines = 1000,
       max_num_results = 20,
@@ -34,21 +60,25 @@ return {
       show_prediction_strength = true,
     })
 
+    -- Set up nvim-cmp
     cmp.setup({
       snippet = {
         expand = function(args)
-          luasnip.lsp_expand(args.body)
+          luasnip.lsp_expand(args.body)  -- Use LuaSnip for snippets
         end,
       },
       view = { entries = "custom" },
       window = {
         completion = {
+          border = "rounded",
           winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:None",
           col_offset = -3,
-          side_padding = 0,
+          side_padding = 1,
+          max_width = 80,
+          max_height = 15,
         },
+        documentation = cmp.config.window.bordered(),
       },
-      completion = { completeopt = "menu,menuone,noinsert" },
       formatting = {
         fields = { "kind", "abbr", "menu" },
         format = function(entry, vim_item)
@@ -73,7 +103,7 @@ return {
             fallback()
           end
         end, { "i", "s" }),
-        ["<C-Space>"] = cmp.mapping.complete(),
+        ["<C-Space>"] = cmp.mapping.complete(), -- Trigger completion manually
         ["<C-l>"] = cmp.mapping(function()
           if luasnip.expand_or_locally_jumpable() then
             luasnip.expand_or_jump()
@@ -86,6 +116,7 @@ return {
         end, { "i", "s" }),
       }),
       sources = cmp.config.sources({
+        { name = "copilot" },  -- Add GitHub Copilot to the sources
         { name = "nvim_lsp" },
         { name = "luasnip" },
         { name = "cmp_tabnine" },
@@ -94,7 +125,10 @@ return {
       }),
     })
 
+    -- Load VSCode snippets for LuaSnip
     require("luasnip.loaders.from_vscode").lazy_load()
+
+    -- Auto update Tabnine status
     vim.cmd([[autocmd User TabnineStatusUpdated lua require'cmp_tabnine'.update_status()]])
   end,
 }
