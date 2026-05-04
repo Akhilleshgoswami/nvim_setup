@@ -15,6 +15,16 @@ keymap.set("n", "<C-u>", "<C-u>zz")
 keymap.set("n", "n", "nzzzv")
 keymap.set("n", "N", "Nzzzv")
 keymap.set("n", "<leader>zig", "<cmd>LspRestart<cr>")
+
+keymap.set("n", "<leader>w", "<cmd>w<CR>", {
+  desc = "Save file",
+})
+keymap.set("n", "<leader>bd", "<cmd>bd<CR>", {
+  desc = "Delete buffer",
+})
+keymap.set("n", "<leader>c", "<cmd>q<CR>", {
+  desc = "Close window",
+})
 --
 -- keymap.set("n", "<leader>vwm", function()
 -- 	require("vim-with-me").StartVimWithMe()
@@ -44,13 +54,13 @@ keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz")
 keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
 
-keymap.set("n", "<leader>ee", "oif err != nil {<CR>}<Esc>Oreturn err<Esc>")
+keymap.set("n", "<leader>q", "oif err != nil {<CR>}<Esc>Oreturn err<Esc>")
 
 keymap.set("n", "<leader>vpp", "<cmd>e ~/.dotfiles/nvim/.config/nvim/lua/theprimeagen/packer.lua<CR>")
 keymap.set("n", "<leader>mr", "<cmd>CellularAutomaton make_it_rain<CR>")
 
 keymap.set("n", "<leader><leader>", function()
-	vim.cmd("so")
+ vim.cmd("so")
 end)
 keymap.set("n", "<leader>t", "<cmd>Sterm<CR>")
 local map = vim.api.nvim_set_keymap
