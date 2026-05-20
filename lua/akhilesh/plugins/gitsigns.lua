@@ -1,77 +1,83 @@
--- Adds git related signs to the gutter, as well as utilities for managing changes
--- NOTE: gitsigns is already included in init.lua but contains only the base
--- config. This will add also the recommended keymaps.
-
 return {
-	{
-		"lewis6991/gitsigns.nvim",
-		opts = {
-			on_attach = function(bufnr)
-				local gitsigns = require("gitsigns")
+  "lewis6991/gitsigns.nvim",
+  event = { "BufReadPre", "BufNewFile" },
+  config = function()
+    if not package.loaded.trouble then
+      package.preload.trouble = function()
+        return true
+      end
+    end
+    require("gitsigns").setup {
+      signcolumn = true,  -- Toggle with `:Gitsigns toggle_signs`
+      numhl      = true, -- Toggle with `:Gitsigns toggle_numhl`
+      linehl     = false, -- Toggle with `:Gitsigns toggle_linehl`
+      word_diff  = false, -- Toggle with `:Gitsigns toggle_word_diff`
+      on_attach = function(bufnr)
+    local gs = package.loaded.gitsigns
 
-				local function map(mode, l, r, opts)
-					opts = opts or {}
-					opts.buffer = bufnr
-					vim.keymap.set(mode, l, r, opts)
-				end
-				-- Navigation
-				map("n", "]c", function()
-					if vim.wo.diff then
-						vim.cmd.normal({ "]c", bang = true })
-					else
-						gitsigns.nav_hunk("next")
-					end
-				end, { desc = "Jump to next git [c]hange" })
+    local function map(mode, l, r, opts)
+      opts = opts or {}
+      opts.buffer = bufnr
+      vim.keymap.set(mode, l, r, opts)
+    end
 
-				map("n", "[c", function()
-					if vim.wo.diff then
-						vim.cmd.normal({ "[c", bang = true })
-					else
-						gitsigns.nav_hunk("prev")
-					end
-				end, { desc = "Jump to previous git [c]hange" })
+    -- Navigation
+    map('n', ']c', function()
+      if vim.wo.diff then return ']c' end
+      vim.schedule(function() gs.next_hunk() end)
+      return '<Ignore>'
+    end, {expr=true})
 
-				-- Actions
-				-- visual mode
-				map("v", "<leader>hs", function()
-					gitsigns.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
-				end, { desc = "stage git hunk" })
-				map("v", "<leader>hr", function()
-					gitsigns.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
-				end, { desc = "reset git hunk" })
-				-- normal mode
-				map("n", "<leader>hs", gitsigns.stage_hunk, { desc = "git [s]tage hunk" })
-				map("n", "<leader>rh", gitsigns.reset_hunk, { desc = "git [r]eset hunk" })
-				map("n", "<leader>hS", gitsigns.stage_buffer, { desc = "git [S]tage buffer" })
-				map("n", "<leader>hu", gitsigns.undo_stage_hunk, { desc = "git [u]ndo stage hunk" })
-				map("n", "<leader>hR", gitsigns.reset_buffer, { desc = "git [R]eset buffer" })
-				map("n", "<leader>ph", gitsigns.preview_hunk, { desc = "git [p]review hunk" })
-				map("n", "<leader>gb", gitsigns.blame_line, { desc = "git [b]lame line" })
-				map("n", "<leader>hd", gitsigns.diffthis, { desc = "git [d]iff against index" })
-				map("n", "<leader>hD", function()
-					gitsigns.diffthis("@")
-				end, { desc = "git [D]iff against last commit" })
-				-- Toggles
-				map("n", "<leader>tb", gitsigns.toggle_current_line_blame, { desc = "[T]oggle git show [b]lame line" })
-				map("n", "<leader>tD", gitsigns.toggle_deleted, { desc = "[T]oggle git show [D]eleted" })
-			end,
-			signs = {
-				delete = { text = "󰍵" },
-				changedelete = { text = "󱕖" },
-			},
-			current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
-			current_line_blame_opts = {
-				virt_text = true,
-				virt_text_pos = "eol", -- 'eol' | 'overlay' | 'right_align'
-				delay = 1000,
-				ignore_whitespace = false,
-				virt_text_priority = 100,
-			},
-			current_line_blame_formatter = "<author>, <author_time:%R> - <summary>",
-			sign_priority = 6,
-			update_debounce = 100,
-			status_formatter = nil, -- Use default
-			max_file_length = 40000, -- Disable if file is longer than this (in lines)
-		},
-	},
+    map('n', '[c', function()
+      if vim.wo.diff then return '[c' end
+      vim.schedule(function() gs.prev_hunk() end)
+      return '<Ignore>'
+    end, {expr=true})
+
+    -- Actions
+    vim.keymap.set('n', '<leader>hs', gs.stage_hunk, {noremap = true, silent = true})
+    vim.keymap.set('n', '<leader>hr', gs.reset_hunk, {noremap = true, silent = true})
+    vim.keymap.set('v', '<leader>hs', function() gs.stage_hunk {vim.fn.line('.'), vim.fn.line('v')} end, {noremap = true, silent = true})
+    vim.keymap.set('v', '<leader>hr', function() gs.reset_hunk {vim.fn.line('.'), vim.fn.line('v')} end, {noremap = true, silent = true})
+    vim.keymap.set('n', '<leader>hS', gs.stage_buffer, {noremap = true, silent = true})
+    vim.keymap.set('n', '<leader>hu', gs.undo_stage_hunk, {noremap = true, silent = true})
+    vim.keymap.set('n', '<leader>hR', gs.reset_buffer, {noremap = true, silent = true})
+    vim.keymap.set('n', '<leader>hp', gs.preview_hunk, {noremap = true, silent = true})
+    vim.keymap.set('n', '<leader>hb', function() gs.blame_line{full=true} end, {noremap = true, silent = true})
+    vim.keymap.set('n', '<leader>hB', gs.toggle_current_line_blame, {noremap = true, silent = true})
+    vim.keymap.set('n', '<leader>hd', gs.diffthis, {noremap = true, silent = true})
+    vim.keymap.set('n', '<leader>hD', function() gs.diffthis('~') end, {noremap = true, silent = true})
+    vim.keymap.set('n', '<leader>hx', gs.toggle_deleted, {noremap = true, silent = true})
+
+    -- Text object
+    map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
+  end,
+      watch_gitdir = {
+        interval = 1000,
+        follow_files = true
+      },
+      attach_to_untracked = true,
+      current_line_blame = false, -- Toggle with `:Gitsigns toggle_current_line_blame`
+      current_line_blame_opts = {
+        virt_text = true,
+        virt_text_pos = 'eol', -- 'eol' | 'overlay' | 'right_align'
+        ignore_whitespace = false,
+      },
+      sign_priority = 6,
+      update_debounce = 100,
+      status_formatter = nil, -- Use default
+      max_file_length = 40000,
+      preview_config = {
+        -- Options passed to nvim_open_win
+        border = {"┏", "━", "┓", "┃", "┛", "━", "┗", "┃"},
+        style = 'minimal',
+        relative = 'cursor',
+        row = 0,
+        col = 1
+      },
+    }
+    package.loaded.trouble = nil
+    package.preload.trouble = nil
+  end,
 }
+

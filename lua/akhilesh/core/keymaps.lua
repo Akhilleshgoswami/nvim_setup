@@ -43,7 +43,6 @@ keymap.set("n", "<leader>Y", [["+Y]])
 vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]])
 
 keymap.set("n", "Q", "<nop>")
-keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>")
 keymap.set("n", "<leader>f", vim.lsp.buf.format)
 
 keymap.set("n", "<C-k>", "<cmd>cnext<CR>zz")
@@ -71,7 +70,6 @@ map("n", "<tab>", "<Cmd>BufferPrevious<CR>", opts)
 map("n", "<S-tab>", "<Cmd>BufferNext<CR>", opts)
 map("n", "<S-C>", "<Cmd>BufferClose<CR>", opts)
 -- vim.api.nvim_set_keymap("n", ":", "<cmd>FineCmdline<CR>", { noremap = true })
-vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
 vim.cmd("highlight! HarpoonInactive guibg=NONE guifg=#63698c")
 vim.cmd("highlight! HarpoonActive guibg=NONE guifg=white")
 vim.cmd("highlight! HarpoonNumberActive guibg=NONE guifg=#7aa2f7")
@@ -82,4 +80,5 @@ vim.keymap.set("n", "<leader>gd", ":DiffviewOpen<CR>", { desc = "Open Git Diff" 
 vim.keymap.set("n", "<leader>gc", ":DiffviewClose<CR>", { desc = "Close Git Diff" })
 
 vim.keymap.set("n", "<leader>q", ":DiffviewToggleFiles<CR>", { desc = "Close Toggle File Git" })
+
 

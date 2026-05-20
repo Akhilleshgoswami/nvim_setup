@@ -1,3 +1,3 @@
-require("akhilesh.core")
 require("akhilesh.lazy")
+require("akhilesh.core")
 
