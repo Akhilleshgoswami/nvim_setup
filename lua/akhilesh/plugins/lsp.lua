@@ -1,155 +1,239 @@
 return {
- "neovim/nvim-lspconfig",
- dependencies = {
-  { "williamboman/mason.nvim", config = true },
-  "williamboman/mason-lspconfig.nvim",
-  "WhoIsSethDaniel/mason-tool-installer.nvim",
-  { "j-hui/fidget.nvim",       opts = {} },
-  { "folke/neodev.nvim",       opts = {} },
+  "neovim/nvim-lspconfig",
 
-  -- Completion and snippet plugins (for luasnip, cmp etc)
-  { "hrsh7th/nvim-cmp" },
-  { "hrsh7th/cmp-nvim-lsp" },
-  { "hrsh7th/cmp-buffer" },
-  { "hrsh7th/cmp-path" },
-  { "L3MON4D3/LuaSnip" },
-  { "saadparwaiz1/cmp_luasnip" },
- },
+  dependencies = {
+    -- Mason
+    { "williamboman/mason.nvim", config = true },
+    "williamboman/mason-lspconfig.nvim",
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
 
- config = function()
-  -- Set completeopt for proper completion menu behavior
-  vim.o.completeopt = "menu,menuone,noinsert"
+    -- UI
+    { "j-hui/fidget.nvim", opts = {} },
+    { "folke/neodev.nvim", opts = {} },
 
-  -- Diagnostic config
-  vim.diagnostic.config({
-   virtual_text = true,
-   signs = true,
-   underline = true,
-   update_in_insert = false,
-   severity_sort = true,
-  })
+    -- CMP
+    { "hrsh7th/nvim-cmp" },
+    { "hrsh7th/cmp-nvim-lsp" },
+    { "hrsh7th/cmp-buffer" },
+    { "hrsh7th/cmp-path" },
 
-  -- LSP attach autocmd and keymaps
-  vim.api.nvim_create_autocmd("LspAttach", {
-   group = vim.api.nvim_create_augroup("lsp_attach_config", { clear = true }),
-   callback = function(event)
-    local opts = { buffer = event.buf }
+    -- Snippets
+    { "L3MON4D3/LuaSnip" },
+    { "saadparwaiz1/cmp_luasnip" },
+  },
 
-    local map = function(keys, func, desc)
-     if desc then
-      desc = "LSP: " .. desc
-     end
-     vim.keymap.set("n", keys, func, vim.tbl_extend("force", opts, { desc = desc }))
+  config = function()
+    vim.o.completeopt = "menu,menuone,noinsert"
+
+    -- Diagnostics
+    vim.diagnostic.config({
+      virtual_text = true,
+      signs = true,
+      underline = true,
+      update_in_insert = false,
+      severity_sort = true,
+    })
+
+    -- Fix position_encoding warning
+    local orig_util = vim.lsp.util.make_position_params
+
+    vim.lsp.util.make_position_params = function(window, position_encoding)
+      position_encoding = position_encoding or "utf-16"
+      return orig_util(window, position_encoding)
     end
 
-    map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
-    map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
-    map("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
-    map("<leader>D", require("telescope.builtin").lsp_type_definitions, "Type [D]efinition")
-    map("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
-    map("<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
-    map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
-    -- map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
-    map("K", vim.lsp.buf.hover, "Hover Documentation")
-    map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
+    -- LSP keymaps
+    vim.api.nvim_create_autocmd("LspAttach", {
+      group = vim.api.nvim_create_augroup("lsp_attach_config", { clear = true }),
 
-    local client = vim.lsp.get_client_by_id(event.data.client_id)
-    if client and client.server_capabilities.documentHighlightProvider then
-     local group = vim.api.nvim_create_augroup("lsp_document_highlight", { clear = false })
-     vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-      buffer = event.buf,
-      group = group,
-      callback = vim.lsp.buf.document_highlight,
-     })
-     vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-      buffer = event.buf,
-      group = group,
-      callback = vim.lsp.buf.clear_references,
-     })
-    end
+      callback = function(event)
+        local opts = { buffer = event.buf }
 
-    if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
-     map("<leader>th", function()
-      if vim.lsp.inlay_hint.is_enabled() then
-       vim.lsp.inlay_hint.disable()
-      else
-       vim.lsp.inlay_hint.enable()
-      end
-     end, "[T]oggle [H]ints")
-    end
-   end,
-  })
+        local map = function(keys, func, desc)
+          if desc then
+            desc = "LSP: " .. desc
+          end
 
-  -- Setup capabilities with nvim-cmp
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
-  capabilities = vim.tbl_deep_extend(
-   "force",
-   capabilities,
-   require("cmp_nvim_lsp").default_capabilities()
-  )
+          vim.keymap.set(
+            "n",
+            keys,
+            func,
+            vim.tbl_extend("force", opts, { desc = desc })
+          )
+        end
 
-  local servers = {
-       gopls = {
+        map("gd", require("telescope.builtin").lsp_definitions, "Goto Definition")
+        map("gr", require("telescope.builtin").lsp_references, "Goto References")
+        map("gI", require("telescope.builtin").lsp_implementations, "Goto Implementation")
+
+        map(
+          "<leader>D",
+          require("telescope.builtin").lsp_type_definitions,
+          "Type Definition"
+        )
+
+        map(
+          "<leader>ds",
+          require("telescope.builtin").lsp_document_symbols,
+          "Document Symbols"
+        )
+
+        map(
+          "<leader>ws",
+          require("telescope.builtin").lsp_dynamic_workspace_symbols,
+          "Workspace Symbols"
+        )
+
+        map("<leader>rn", vim.lsp.buf.rename, "Rename")
+        map("K", vim.lsp.buf.hover, "Hover")
+        map("gD", vim.lsp.buf.declaration, "Goto Declaration")
+
+        local client = vim.lsp.get_client_by_id(event.data.client_id)
+
+        -- Highlight references
+        if client and client.server_capabilities.documentHighlightProvider then
+          local group = vim.api.nvim_create_augroup(
+            "lsp_document_highlight",
+            { clear = false }
+          )
+
+          vim.api.nvim_create_autocmd(
+            { "CursorHold", "CursorHoldI" },
+            {
+              buffer = event.buf,
+              group = group,
+              callback = vim.lsp.buf.document_highlight,
+            }
+          )
+
+          vim.api.nvim_create_autocmd(
+            { "CursorMoved", "CursorMovedI" },
+            {
+              buffer = event.buf,
+              group = group,
+              callback = vim.lsp.buf.clear_references,
+            }
+          )
+        end
+
+        -- Inlay hints
+        if client and client.server_capabilities.inlayHintProvider then
+          map("<leader>th", function()
+            vim.lsp.inlay_hint.enable(
+              not vim.lsp.inlay_hint.is_enabled()
+            )
+          end, "Toggle Hints")
+        end
+      end,
+    })
+
+    -- Capabilities
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
+
+    capabilities = vim.tbl_deep_extend(
+      "force",
+      capabilities,
+      require("cmp_nvim_lsp").default_capabilities()
+    )
+
+    -- Servers
+    local servers = {
+      lua_ls = {
         capabilities = capabilities,
+
         settings = {
-         gopls = {
-          analyses = {
-           unusedparams = true,
-           unreachable = true,
+          Lua = {
+            completion = {
+              callSnippet = "Replace",
+            },
           },
-          staticcheck = true,
-          completions = {
-           unimported = true,
-           usePlaceholders = true,
-          },
-         },
         },
-       },
-       lua_ls = {
-        capabilities = capabilities,
-        settings = {
-         Lua = {
-          completion = { callSnippet = "Replace" },
-         },
-        },
-       },
-       move_analyzer = {
-        cmd = { "move-analyzer" },
-        filetypes = { "move" },
-        root_markers = { "Move.toml" },
-        capabilities = capabilities,
-       },
-     
-
       },
 
-      require("mason").setup({
-       PATH = "skip",
-       ui = {
-        icons = {
-         package_pending = " ",
-         package_installed = " ",
-         package_uninstalled = " ",
+      gopls = {
+        capabilities = capabilities,
+
+        settings = {
+          gopls = {
+            analyses = {
+              unusedparams = true,
+              unreachable = true,
+            },
+
+            staticcheck = true,
+          },
         },
-       },
-       max_concurrent_installers = 10,
-      })
+      },
 
-  local ensure_installed = vim.tbl_keys(servers)
-  vim.list_extend(ensure_installed, { "stylua" })
-  require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
+      tsserver = {
+        capabilities = capabilities,
 
-  require("mason-lspconfig").setup({
-   handlers = {
-    function(server_name)
-     local server_opts = servers[server_name] or {}
-     require("lspconfig")[server_name].setup(server_opts)
-    end,
-   },
-  })
+        init_options = {
+          preferences = {
+            includeInlayParameterNameHints = "all",
+            includeInlayVariableTypeHints = true,
+          },
+        },
 
-  vim.lsp.handlers["textDocument/formatting"] = function() end
+        settings = {
+          javascript = {
+            suggest = {
+              completeFunctionCalls = true,
+            },
+          },
 
-  require("luasnip.loaders.from_vscode").lazy_load()
- end,
+          typescript = {
+            suggest = {
+              completeFunctionCalls = true,
+            },
+          },
+        },
+      },
+    }
+
+    -- Mason
+    require("mason").setup({
+      PATH = "skip",
+
+      ui = {
+        icons = {
+          package_pending = " ",
+          package_installed = " ",
+          package_uninstalled = " ",
+        },
+      },
+    })
+
+    -- Install automatically
+    require("mason-tool-installer").setup({
+      ensure_installed = {
+        "lua-language-server",
+        "gopls",
+        "typescript-language-server",
+        "stylua",
+      },
+    })
+
+    require("mason-lspconfig").setup({
+      ensure_installed = {
+        "lua_ls",
+        "gopls",
+        "tsserver",
+      },
+
+      handlers = {
+        function(server_name)
+          local server_opts = servers[server_name] or {}
+
+          require("lspconfig")[server_name].setup(server_opts)
+        end,
+      },
+    })
+
+    -- Disable formatting
+    vim.lsp.handlers["textDocument/formatting"] = function() end
+
+    -- Snippets
+    require("luasnip.loaders.from_vscode").lazy_load()
+  end,
 }

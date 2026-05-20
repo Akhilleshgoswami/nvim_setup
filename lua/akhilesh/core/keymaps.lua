@@ -82,3 +82,4 @@ vim.keymap.set("n", "<leader>gd", ":DiffviewOpen<CR>", { desc = "Open Git Diff" 
 vim.keymap.set("n", "<leader>gc", ":DiffviewClose<CR>", { desc = "Close Git Diff" })
 
 vim.keymap.set("n", "<leader>q", ":DiffviewToggleFiles<CR>", { desc = "Close Toggle File Git" })
+
