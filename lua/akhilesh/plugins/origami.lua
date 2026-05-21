@@ -30,7 +30,7 @@ return {
 
 			vim.opt.winborder = "rounded"
 
-			vim.opt.list =false
+			vim.opt.list = false
 			vim.opt.listchars = {
 				tab = "→ ",
 				trail = "·",

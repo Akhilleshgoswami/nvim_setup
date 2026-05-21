@@ -1,4 +1,5 @@
 -- lua/akhilesh/plugins/dropbar.lua
+
 return {
   {
     "Bekaboo/dropbar.nvim",

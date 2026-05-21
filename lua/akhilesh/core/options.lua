@@ -1,65 +1,121 @@
-vim.opt.guicursor = ""
+local opt = vim.opt
 
-vim.opt.nu = true
-vim.opt.relativenumber = true
+opt.sidescrolloff = 8 -- Columns of context
+-- Global
+vim.g.autoformat = true
+vim.opt.fillchars = {
+  fold = " ",
+  foldopen = "",
+  foldclose = "",
+  foldsep = " ",
+  diff = "╱",
+  eob = " ",
+}
+vim.opt.listchars = {
+  tab = ">>>",
+  trail = "·",
+  precedes = "←",
+  extends = "→",eol = "↲",
+  nbsp = "␣",
+}
+opt.autowrite = true -- Enable auto write
+opt.foldnestmax = 4
+opt.foldlevel = 1
+opt.foldcolumn = "1"
+opt.foldexpr = "nvim_treesitter#foldexpr()"
+opt.foldmethod = "expr"
+opt.foldlevelstart = 99
+opt.foldenable = true
+-- opt.showtabline = 2
+opt.mouse = 'a'
+opt.backupcopy = 'yes'
+opt.undolevels = 10000
+opt.shortmess:append({ W = true, I = true, c = true, C = true })
+-- opt.shortmess:append { c = true, S = true }
+opt.showmode = false
+opt.hidden = true
+opt.splitright = true
+opt.splitbelow = true
+opt.wrapscan = true
+opt.backup = false
+opt.writebackup = false
+opt.showcmd = true
+opt.showmatch = true
+opt.ignorecase = true
+opt.hlsearch = true
+opt.smartcase = true
+opt.errorbells = false
+opt.joinspaces = false
+opt.title = true
+opt.encoding = 'UTF-8'
+opt.completeopt = { 'menu', 'menuone', 'noselect' }
+opt.clipboard = 'unnamedplus'
+opt.laststatus = 3
+opt.timeoutlen = 500
+opt.splitkeep = 'screen'
+opt.termguicolors = true -- True color support
+opt.updatetime = 200 -- Save swap file and trigger CursorHold
+opt.virtualedit = "block" -- Allow cursor to move where there is no text in visual block mode
+opt.wildmode = "longest:full,full" -- Command-line completion mode
+opt.winminwidth = 5 -- Minimum window width
+-- opt.wrap = false -- Disable line wrap
+opt.fileformat = 'unix'
+opt.tabstop = 2
+opt.spelllang = 'it'
+opt.softtabstop = 2
+opt.swapfile = false
+opt.undofile = false
+opt.smartindent = true
+opt.expandtab = true
+opt.shiftwidth = 2
+opt.number = true
+opt.colorcolumn = "+1"
+opt.list = true
+opt.signcolumn = 'yes:1'
+opt.relativenumber = true
+opt.cursorline = true
+opt.conceallevel = 2 -- Hide * markup for bold and italic, but not markers with substitutions
+opt.confirm = true -- Confirm to save changes before exiting modified buffer
+opt.formatoptions = "jcroqlnt" -- tcqj
+opt.grepformat = "%f:%l:%c:%m"
+opt.grepprg = "rg --vimgrep"
+opt.inccommand = "nosplit" -- preview incremental substitute
+opt.pumblend = 10 -- Popup blend
+opt.pumheight = 10 -- Maximum number of entries in a popup
+opt.scrolloff = 4 -- Lines of context
+opt.sessionoptions = { "buffers", "curdir", "tabpages", "winsize", "help", "globals", "skiprtp", "folds" }
+opt.shiftround = true -- Round indent
+opt.diffopt = "internal,filler,closeoff,linematch:60"
 
-vim.opt.tabstop = 1 -- Number of spaces a tab counts for
-vim.opt.softtabstop = 1 -- Number of spaces Neovim uses when you press <Tab>
-vim.opt.shiftwidth = 1 -- Number of spaces to use for each indentation level
-vim.opt.expandtab = true
-
-vim.opt.smartindent = true
-vim.opt.wrap = false
-
-vim.opt.swapfile = false
-vim.opt.backup = false
-vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
-vim.opt.undofile = true
-
-vim.opt.hlsearch = false
-vim.opt.incsearch = true
-
-vim.opt.termguicolors = true
-
-vim.opt.scrolloff = 8
-vim.opt.signcolumn = "yes"
-vim.opt.isfname:append("@-@")
-
-vim.opt.updatetime = 50
-
-vim.opt.colorcolumn = "80"
-
--- split windows
-vim.opt.splitright = true -- split vertical window to the right
-vim.opt.splitbelow = true -- split horizontal window to the bottom
-
--- turn off swapfile
-vim.opt.swapfile = false
--- recommended settings from nvim-tree documentation
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
--- vim.api.nvim_create_autocmd("VimEnter", {
--- 	command = "set nornu nonu | Neotree toggle",
--- })
--- vim.api.nvim_create_autocmd("BufEnter", {
--- 	command = "set rnu nu",
--- })
-vim.api.nvim_set_hl(0, "NvimTreeNormal", { bg = "NONE" })
-vim.api.nvim_set_hl(0, "NvimTreeNormalNC", { bg = "NONE" })
--- Add more highlight groups as needed
-vim.api.nvim_create_augroup("nobg", { clear = true })
-vim.api.nvim_create_autocmd({ "ColorScheme" }, {
-	desc = "Make all backgrounds transparent",
-	group = "nobg",
-	pattern = "*",
-	callback = function()
-		vim.api.nvim_set_hl(0, "Normal", { bg = "NONE", ctermbg = "NONE" })
-		vim.api.nvim_set_hl(0, "NeoTreeNormal", { bg = "NONE", ctermbg = "NONE" })
-		vim.api.nvim_set_hl(0, "NeoTreeNormalNC", { bg = "NONE", ctermbg = "NONE" })
-		vim.api.nvim_set_hl(0, "NeoTreeNormalNC", { bg = "NONE", ctermbg = "NONE" })
-		vim.api.nvim_set_hl(0, "TelescopeNormal", { bg = "none" })
-		-- Set up Telescope transparency
-		vim.api.nvim_set_hl(0, "TelescopeNormal", { bg = "none" })
-	end,
+vim.api.nvim_create_autocmd("BufReadPost", {
+  callback = function()
+    local last_pos = vim.fn.line("'\"")
+    if last_pos > 0 and last_pos <= vim.fn.line("$") then
+      vim.api.nvim_win_set_cursor(0, {last_pos, 0})
+    end
+  end,
 })
-vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+
+vim.api.nvim_create_autocmd("TextYankPost", {
+  callback =  function()
+    vim.highlight.on_yank()
+  end,
+})
+
+-- Fix markdown indentation settings
+vim.g.markdown_recommended_style = 0
+
+if vim.fn.has("nvim-0.10") == 1 then
+  opt.smoothscroll = true
+end
+
+vim.api.nvim_create_autocmd("User", {
+  pattern = "OilEnter",
+  callback = vim.schedule_wrap(function(args)
+    local oil = require("oil")
+    if vim.api.nvim_get_current_buf() == args.data.buf and oil.get_cursor_entry() then
+      oil.open_preview()
+    end
+  end),
+})
+

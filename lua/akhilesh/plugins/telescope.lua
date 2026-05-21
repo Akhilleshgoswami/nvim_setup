@@ -84,21 +84,17 @@ config = function()
   end, { desc = "[R]eplace [W]ord globally" })
 
   vim.keymap.set("n", "<leader>/", function()
-    builtin.current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
-      winblend = 10,
-      previewer = false,
-    }))
-  end, { desc = "[/] Fuzzily search in current buffer" })
-
+  Snacks.picker.lines()
+end, { desc = "[/] Fuzzily search in current buffer" })
   vim.keymap.set("n", "<leader>s/", function()
     builtin.live_grep({
       grep_open_files = true,
-      prompt_title = "Live Grep in Open Files",
+      prompt_title = "live grep in open files",
     })
-  end, { desc = "[S]earch [/] in Open Files" })
+  end, { desc = "[s]earch [/] in open files" })
 
   vim.keymap.set("n", "<leader>sn", function()
     builtin.find_files({ cwd = vim.fn.stdpath("config") })
-  end, { desc = "[S]earch [N]eovim files" })
+  end, { desc = "[s]earch [n]eovim files" })
 end,
 }

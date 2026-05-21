@@ -1,31 +1,18 @@
 return {
   "nvim-treesitter/nvim-treesitter",
-  version = "v0.9.3",
+  lazy = false,
   build = ":TSUpdate",
-  opts = {
-    ensure_installed = {
-      "bash",
-      "c",
-      "diff",
-      "html",
-      "lua",
-      "luadoc",
-      "go",
-      "vim",
-      "vimdoc",
-      "typescript",
-      "javascript",
-    },
-    auto_install = true,
-    highlight = {
-      enable = true,
-      additional_vim_regex_highlighting = { "ruby" },
-    },
-    indent = { enable = true, disable = { "ruby" } },
-  },
-  config = function(_, opts)
-    require("nvim-treesitter.install").prefer_git = true
-    ---@diagnostic disable-next-line: missing-fields
-    require("nvim-treesitter.configs").setup(opts)
+  config = function()
+    -- Only needed if you want a custom install dir; otherwise omit entirely
+    require("nvim-treesitter").setup({
+      install_dir = vim.fn.stdpath("data") .. "/site",
+    })
+
+    -- Install parsers (async, no-op if already installed)
+    require("nvim-treesitter").install({
+      "bash", "c", "diff", "html",
+      "lua", "go",
+      "vim", "vimdoc", "typescript", "javascript",
+    })
   end,
 }
