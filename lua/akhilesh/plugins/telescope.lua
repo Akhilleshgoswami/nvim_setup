@@ -1,8 +1,3 @@
--- ============================================================
--- lua/akhilesh/plugins/telescope.lua
--- ZERO CRASH + TREESITTER SAFE VERSION (FIXED)
--- ============================================================
-
 return {
   "nvim-telescope/telescope.nvim",
   branch = "0.1.x",
@@ -34,28 +29,53 @@ return {
     local actions = require("telescope.actions")
     local builtin = require("telescope.builtin")
     local themes = require("telescope.themes")
+    local previewers = require("telescope.previewers")
 
     -- ============================================================
-    -- SAFE UI HIGHLIGHTS
+    -- 🔥 FIX 1: PATCH ft_to_lang CRASH (ROOT CAUSE)
+    -- ============================================================
+
+    local utils_ok, utils = pcall(require, "telescope.utils")
+    if utils_ok then
+      utils.ft_to_lang = function()
+        return nil
+      end
+    end
+
+    -- ============================================================
+    -- PALETTE
+    -- ============================================================
+
+    local c = {
+      bg = "#1a1b26",
+      bg_dark = "#16161e",
+      bg_alt = "#1f2335",
+      bg_highlight = "#292e42",
+      fg = "#c0caf5",
+      comment = "#565f89",
+      orange = "#ff9e64",
+      red = "#f7768e",
+      green = "#9ece6a",
+      yellow = "#e0af68",
+    }
+
+    -- ============================================================
+    -- HIGHLIGHTS
     -- ============================================================
 
     local function set_hl()
       local set = vim.api.nvim_set_hl
 
-      set(0, "TelescopeNormal", { bg = "NONE" })
-      set(0, "TelescopeBorder", { fg = "#00d4ff", bg = "NONE" })
-      set(0, "TelescopeTitle", { fg = "#ff4fd8", bold = true })
+      set(0, "TelescopeNormal", { bg = c.bg_dark, fg = c.fg })
+      set(0, "TelescopeBorder", { bg = c.bg_dark, fg = c.bg_dark })
 
-      set(0, "TelescopePromptBorder", { fg = "#00d4ff" })
-      set(0, "TelescopePromptTitle", { fg = "#00d4ff", bold = true })
+      set(0, "TelescopePromptNormal", { bg = c.bg_alt, fg = c.fg })
+      set(0, "TelescopePromptBorder", { bg = c.bg_alt, fg = c.bg_alt })
 
-      set(0, "TelescopeResultsBorder", { fg = "#444444" })
-      set(0, "TelescopePreviewBorder", { fg = "#39ff14" })
+      set(0, "TelescopeSelection", { bg = c.bg_highlight, fg = c.orange, bold = true })
+      set(0, "TelescopeMatching", { fg = c.yellow, bold = true })
 
-      set(0, "TelescopeSelection", { fg = "#ffe66d", bold = true })
-      set(0, "TelescopeSelectionCaret", { fg = "#ff4fd8" })
-
-      set(0, "TelescopeMatching", { fg = "#39ff14", bold = true })
+      set(0, "TelescopePreviewBorder", { bg = c.bg_dark, fg = c.bg_dark })
     end
 
     set_hl()
@@ -67,34 +87,24 @@ return {
     })
 
     -- ============================================================
-    -- SAFE TELESCOPE SETUP (FIXED)
+    -- SAFE SETUP (NO TREESITTER INTEGRATION)
     -- ============================================================
 
     telescope.setup({
       defaults = {
-        prompt_prefix = "   ",
-        selection_caret = "❯ ",
-        entry_prefix = "  ",
-
+        prompt_prefix = "   ",
+        selection_caret = " ❯ ",
         sorting_strategy = "ascending",
         layout_strategy = "horizontal",
 
-        winblend = 10,
-
-        layout_config = {
-          horizontal = {
-            preview_width = 0.55,
-          },
-          width = 0.92,
-          height = 0.90,
-        },
+        winblend = 0,
+        path_display = { "smart" },
 
         file_ignore_patterns = {
           "node_modules",
-          ".git/",
+          "%.git/",
           "dist",
           "build",
-          "coverage",
         },
 
         mappings = {
@@ -106,33 +116,31 @@ return {
           },
         },
 
-        -- 🚨 IMPORTANT FIX: DISABLE TREE-SITTER IN TELESCOPE
+        -- 🔥 IMPORTANT: disable treesitter preview
         preview = {
           treesitter = false,
+          filesize_limit = 2,
+          timeout = 200,
         },
+
+        -- 🔥 EXTRA SAFETY: avoid TS buffer processing entirely
+        buffer_previewer_maker = function(filepath, bufnr, opts)
+          vim.bo[bufnr].filetype = ""
+          previewers.buffer_previewer_maker(filepath, bufnr, opts)
+        end,
       },
 
       pickers = {
         find_files = {
-          theme = "ivy",
           hidden = true,
         },
 
-        live_grep = {
-          theme = "ivy",
-          additional_args = function()
-            return { "--hidden" }
-          end,
-        },
-
         buffers = {
-          theme = "dropdown",
           previewer = false,
         },
 
-        current_buffer_fuzzy_find = {
-          theme = "dropdown",
-          previewer = false,
+        colorscheme = {
+          enable_preview = true,
         },
       },
 
@@ -145,78 +153,57 @@ return {
       },
     })
 
-    -- extensions
+    -- ============================================================
+    -- EXTENSIONS
+    -- ============================================================
+
     pcall(telescope.load_extension, "fzf")
     pcall(telescope.load_extension, "ui-select")
     pcall(telescope.load_extension, "file_browser")
 
     -- ============================================================
-    -- SAFE FILETYPE FIX (NO CRASH, NO PLENARY OVERRIDE)
+    -- SAFE AUTOCMD
     -- ============================================================
 
     vim.api.nvim_create_autocmd("User", {
       pattern = "TelescopePreviewerLoaded",
       callback = function(args)
         local buf = args.buf
-        if not buf or not vim.api.nvim_buf_is_valid(buf) then
-          return
-        end
+        if not buf or not vim.api.nvim_buf_is_valid(buf) then return end
 
-        local bufname = vim.api.nvim_buf_get_name(buf)
-        if bufname == "" then
-          return
-        end
+        local ok, name = pcall(vim.api.nvim_buf_get_name, buf)
+        if not ok or name == "" then return end
 
         vim.schedule(function()
-          if vim.filetype and vim.filetype.match then
-            local ft = vim.filetype.match({ filename = bufname })
-            if ft then
+          local ft = vim.filetype.match({ filename = name })
+          if ft and ft ~= "" then
+            pcall(function()
               vim.bo[buf].filetype = ft
-            end
+            end)
           end
         end)
       end,
     })
 
     -- ============================================================
-    -- KEYMAPS
+    -- KEYMAPS (SAFE VERSION)
     -- ============================================================
 
-    vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find files" })
-    vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Live grep" })
-    vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Buffers" })
-    vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Help" })
-    vim.keymap.set("n", "<leader>fo", builtin.oldfiles, { desc = "Recent files" })
-    vim.keymap.set("n", "<leader>fw", builtin.grep_string, { desc = "Search word" })
-    vim.keymap.set("n", "<leader>fd", builtin.diagnostics, { desc = "Diagnosbuiltin.diagnosticstics" })
+    local map = function(lhs, rhs, desc)
+      vim.keymap.set("n", lhs, rhs, { desc = desc, silent = true })
+    end
 
-    vim.keymap.set("n", "<leader>fc", function()
-      telescope.extensions.file_browser.file_browser({
-        path = "%:p:h",
-        select_buffer = true,
-      })
-    end, { desc = "File browser" })
+    map("<leader>ff", builtin.find_files, "Find files")
+    map("<leader>fg", builtin.live_grep, "Live grep")
+    map("<leader>fb", builtin.buffers, "Buffers")
+    map("<leader>fh", builtin.help_tags, "Help")
 
-    -- SAFE BUFFER SEARCH (NO ft_to_lang CRASH)
-    vim.keymap.set("n", "<leader>/", function()
-      builtin.live_grep({
-        grep_open_files = true,
-        prompt_title = "Buffer Search",
-        theme = themes.get_dropdown({
+    map("<leader>/", function()
+      pcall(function()
+        builtin.current_buffer_fuzzy_find(themes.get_dropdown({
           previewer = false,
-        }),
-      })
-    end, { desc = "Buffer search" })
-
-    -- GLOBAL REPLACE
-    vim.keymap.set("n", "<leader>rw", function()
-      local word = vim.fn.expand("<cword>")
-      local replacement = vim.fn.input("Replace " .. word .. " → ")
-
-      if replacement ~= "" then
-        vim.cmd("cfdo %s/" .. word .. "/" .. replacement .. "/g | update")
-        vim.notify("Replaced " .. word .. " → " .. replacement)
-      end
-    end, { desc = "Global replace" })
+        }))
+      end)
+    end, "Buffer search")
   end,
 }
