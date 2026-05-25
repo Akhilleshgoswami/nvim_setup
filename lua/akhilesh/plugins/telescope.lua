@@ -1,100 +1,222 @@
+-- ============================================================
+-- lua/akhilesh/plugins/telescope.lua
+-- ZERO CRASH + TREESITTER SAFE VERSION (FIXED)
+-- ============================================================
+
 return {
-"nvim-telescope/telescope.nvim",
-event = "VimEnter",
-branch = "0.1.x",
-dependencies = {
-  "nvim-lua/plenary.nvim",
-  {
-    "nvim-telescope/telescope-fzf-native.nvim",
-    "folke/todo-comments.nvim",
-    build = "make",
-    cond = function()
-      return vim.fn.executable("make") == 1
-    end,
-  },
-  { "nvim-telescope/telescope-ui-select.nvim" },
-  { "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font },
-},
-config = function()
-  local actions = require("telescope.actions")
+  "nvim-telescope/telescope.nvim",
+  branch = "0.1.x",
+  event = "VimEnter",
 
-  require("telescope").setup({
-    defaults = {
-      prompt_prefix = "   ",
-      selection_caret = "  ",
-      entry_prefix = "   ",
-      path_display = { "truncate" },
-      file_ignore_patterns = {
-        "dist",
-        "target",
-        "node_modules",
-        "pack/plugins",
-      },
-      sorting_strategy = "ascending",
-      layout_config = {
-        horizontal = {
-          prompt_position = "top",
-          preview_width = 0.55,
-        },
-        width = 0.87,
-        height = 0.80,
-      },
-      mappings = {
-        n = {
-          ["q"]  = actions.close,
-          ["dd"] = actions.delete_buffer,
-        },
-        i = {
-          -- ✅ send ALL results to quickfix
-          ["<C-q>"] = actions.send_to_qflist + actions.open_qflist,
-          -- ✅ send SELECTED results to quickfix
-          ["<A-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
-        },
-      },
+  dependencies = {
+    "nvim-lua/plenary.nvim",
+
+    {
+      "nvim-telescope/telescope-fzf-native.nvim",
+      build = "make",
+      cond = function()
+        return vim.fn.executable("make") == 1
+      end,
     },
-  })
 
-  pcall(require("telescope").load_extension, "fzf")
-  pcall(require("telescope").load_extension, "ui-select")
+    {
+      "nvim-tree/nvim-web-devicons",
+      enabled = vim.g.have_nerd_font,
+    },
 
-  local builtin = require("telescope.builtin")
+    "nvim-telescope/telescope-ui-select.nvim",
+    "nvim-telescope/telescope-file-browser.nvim",
+    "folke/todo-comments.nvim",
+  },
 
-  vim.keymap.set('n', '<leader>ff',
-    "<cmd>lua require'telescope.builtin'.find_files({ find_command = {'rg', '--files', '--hidden', '-g', '!.git' }})<cr>")
-  vim.keymap.set("n", "<leader>sh", builtin.help_tags, { desc = "[S]earch [H]elp" })
-  vim.keymap.set("n", "<leader>sk", builtin.keymaps, { desc = "[S]earch [K]eymaps" })
-  vim.keymap.set("n", "<leader>pf", builtin.find_files, { desc = "[S]earch [F]iles" })
-  vim.keymap.set("n", "<leader>ss", builtin.builtin, { desc = "[S]earch [S]elect Telescope" })
-  vim.keymap.set("n", "<leader>sw", builtin.grep_string, { desc = "[S]earch current [W]ord" })
-  vim.keymap.set("n", "<leader>sg", builtin.live_grep, { desc = "[S]earch by [G]rep" })
-  vim.keymap.set("n", "<leader>sd", builtin.diagnostics, { desc = "[S]earch [D]iagnostics" })
-  vim.keymap.set("n", "<leader>sr", builtin.resume, { desc = "[S]earch [R]esume" })
-  vim.keymap.set("n", "<leader>s.", builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-  vim.keymap.set("n", "<leader>b", builtin.buffers, { desc = "[ ] Find existing buffers" })
-  vim.keymap.set("n", "<leader>ft", "<cmd>TodoTelescope<cr>", { desc = "Find todos" })
+  config = function()
+    local telescope = require("telescope")
+    local actions = require("telescope.actions")
+    local builtin = require("telescope.builtin")
+    local themes = require("telescope.themes")
 
-  -- ✅ Global word replace keymap
-  vim.keymap.set("n", "<leader>rw", function()
-    local word = vim.fn.expand("<cword>")  -- grabs word under cursor
-    local replacement = vim.fn.input("Replace [" .. word .. "] with: ")
-    if replacement ~= "" then
-      vim.cmd("cfdo %s/" .. word .. "/" .. replacement .. "/g | update")
-      vim.notify("Replaced [" .. word .. "] with [" .. replacement .. "] globally!", vim.log.levels.INFO)
+    -- ============================================================
+    -- SAFE UI HIGHLIGHTS
+    -- ============================================================
+
+    local function set_hl()
+      local set = vim.api.nvim_set_hl
+
+      set(0, "TelescopeNormal", { bg = "NONE" })
+      set(0, "TelescopeBorder", { fg = "#00d4ff", bg = "NONE" })
+      set(0, "TelescopeTitle", { fg = "#ff4fd8", bold = true })
+
+      set(0, "TelescopePromptBorder", { fg = "#00d4ff" })
+      set(0, "TelescopePromptTitle", { fg = "#00d4ff", bold = true })
+
+      set(0, "TelescopeResultsBorder", { fg = "#444444" })
+      set(0, "TelescopePreviewBorder", { fg = "#39ff14" })
+
+      set(0, "TelescopeSelection", { fg = "#ffe66d", bold = true })
+      set(0, "TelescopeSelectionCaret", { fg = "#ff4fd8" })
+
+      set(0, "TelescopeMatching", { fg = "#39ff14", bold = true })
     end
-  end, { desc = "[R]eplace [W]ord globally" })
 
-  vim.keymap.set("n", "<leader>/", function()
-  Snacks.picker.lines()
-end, { desc = "[/] Fuzzily search in current buffer" })
-  vim.keymap.set("n", "<leader>s/", function()
-    builtin.live_grep({
-      grep_open_files = true,
-      prompt_title = "live grep in open files",
+    set_hl()
+
+    vim.api.nvim_create_autocmd("ColorScheme", {
+      callback = function()
+        vim.schedule(set_hl)
+      end,
     })
-  end, { desc = "[s]earch [/] in open files" })
 
-  vim.keymap.set("n", "<leader>sn", function()
-    builtin.find_files({ cwd = vim.fn.stdpath("config") })
-  end, { desc = "[s]earch [n]eovim files" })
-end,
+    -- ============================================================
+    -- SAFE TELESCOPE SETUP (FIXED)
+    -- ============================================================
+
+    telescope.setup({
+      defaults = {
+        prompt_prefix = "   ",
+        selection_caret = "❯ ",
+        entry_prefix = "  ",
+
+        sorting_strategy = "ascending",
+        layout_strategy = "horizontal",
+
+        winblend = 10,
+
+        layout_config = {
+          horizontal = {
+            preview_width = 0.55,
+          },
+          width = 0.92,
+          height = 0.90,
+        },
+
+        file_ignore_patterns = {
+          "node_modules",
+          ".git/",
+          "dist",
+          "build",
+          "coverage",
+        },
+
+        mappings = {
+          i = {
+            ["<C-j>"] = actions.move_selection_next,
+            ["<C-k>"] = actions.move_selection_previous,
+            ["<C-q>"] = actions.send_to_qflist + actions.open_qflist,
+            ["<Esc>"] = actions.close,
+          },
+        },
+
+        -- 🚨 IMPORTANT FIX: DISABLE TREE-SITTER IN TELESCOPE
+        preview = {
+          treesitter = false,
+        },
+      },
+
+      pickers = {
+        find_files = {
+          theme = "ivy",
+          hidden = true,
+        },
+
+        live_grep = {
+          theme = "ivy",
+          additional_args = function()
+            return { "--hidden" }
+          end,
+        },
+
+        buffers = {
+          theme = "dropdown",
+          previewer = false,
+        },
+
+        current_buffer_fuzzy_find = {
+          theme = "dropdown",
+          previewer = false,
+        },
+      },
+
+      extensions = {
+        ["ui-select"] = themes.get_dropdown({}),
+        file_browser = {
+          theme = "ivy",
+          hijack_netrw = true,
+        },
+      },
+    })
+
+    -- extensions
+    pcall(telescope.load_extension, "fzf")
+    pcall(telescope.load_extension, "ui-select")
+    pcall(telescope.load_extension, "file_browser")
+
+    -- ============================================================
+    -- SAFE FILETYPE FIX (NO CRASH, NO PLENARY OVERRIDE)
+    -- ============================================================
+
+    vim.api.nvim_create_autocmd("User", {
+      pattern = "TelescopePreviewerLoaded",
+      callback = function(args)
+        local buf = args.buf
+        if not buf or not vim.api.nvim_buf_is_valid(buf) then
+          return
+        end
+
+        local bufname = vim.api.nvim_buf_get_name(buf)
+        if bufname == "" then
+          return
+        end
+
+        vim.schedule(function()
+          if vim.filetype and vim.filetype.match then
+            local ft = vim.filetype.match({ filename = bufname })
+            if ft then
+              vim.bo[buf].filetype = ft
+            end
+          end
+        end)
+      end,
+    })
+
+    -- ============================================================
+    -- KEYMAPS
+    -- ============================================================
+
+    vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find files" })
+    vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Live grep" })
+    vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Buffers" })
+    vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Help" })
+    vim.keymap.set("n", "<leader>fo", builtin.oldfiles, { desc = "Recent files" })
+    vim.keymap.set("n", "<leader>fw", builtin.grep_string, { desc = "Search word" })
+    vim.keymap.set("n", "<leader>fd", builtin.diagnostics, { desc = "Diagnosbuiltin.diagnosticstics" })
+
+    vim.keymap.set("n", "<leader>fc", function()
+      telescope.extensions.file_browser.file_browser({
+        path = "%:p:h",
+        select_buffer = true,
+      })
+    end, { desc = "File browser" })
+
+    -- SAFE BUFFER SEARCH (NO ft_to_lang CRASH)
+    vim.keymap.set("n", "<leader>/", function()
+      builtin.live_grep({
+        grep_open_files = true,
+        prompt_title = "Buffer Search",
+        theme = themes.get_dropdown({
+          previewer = false,
+        }),
+      })
+    end, { desc = "Buffer search" })
+
+    -- GLOBAL REPLACE
+    vim.keymap.set("n", "<leader>rw", function()
+      local word = vim.fn.expand("<cword>")
+      local replacement = vim.fn.input("Replace " .. word .. " → ")
+
+      if replacement ~= "" then
+        vim.cmd("cfdo %s/" .. word .. "/" .. replacement .. "/g | update")
+        vim.notify("Replaced " .. word .. " → " .. replacement)
+      end
+    end, { desc = "Global replace" })
+  end,
 }

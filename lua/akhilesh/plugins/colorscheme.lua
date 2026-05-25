@@ -5,7 +5,7 @@ return {
     "folke/tokyonight.nvim",
     lazy = true,
     opts = {
-      style       = "night", -- night | storm | moon | day
+      style = "night",
       transparent = false,
       styles = {
         comments = { italic = true },
@@ -19,7 +19,7 @@ return {
     name = "catppuccin",
     lazy = true,
     opts = {
-      flavour = "mocha", -- latte | frappe | macchiato | mocha
+      flavour = "mocha",
     },
   },
 
@@ -28,7 +28,7 @@ return {
     name = "rose-pine",
     lazy = true,
     opts = {
-      variant = "moon", -- auto | main | moon | dawn
+      variant = "moon",
     },
   },
 
@@ -36,14 +36,14 @@ return {
     "rebelot/kanagawa.nvim",
     lazy = true,
     opts = {
-      theme = "wave", -- wave | dragon | lotus
+      theme = "wave",
     },
   },
 
-  -- ── Active scheme (change this one line to switch) ─────────
+  -- ── Active scheme ─────────────────────────────────────────
   {
     "ellisonleao/gruvbox.nvim",
-    lazy    = false,
+    lazy = false,
     priority = 1000,
     opts = { contrast = "hard" },
     config = function(_, opts)
@@ -51,8 +51,19 @@ return {
       vim.cmd.colorscheme("gruvbox")
     end,
   },
-  vim.keymap.set("n", "<leader>cs", function()
-  Snacks.picker.colorschemes()
-end, { desc = "Pick colorscheme"})
-}
 
+  -- ── Keymaps (PUT IN CONFIG, NOT HERE) ─────────────────────
+  {
+    "LazyVim/LazyVim",
+    config = function()
+      vim.keymap.set("n", "<leader>cs", function()
+        -- fallback if Snacks exists
+        if pcall(require, "snacks") then
+          require("snacks").picker.colorschemes()
+        else
+          vim.cmd("Telescope colorscheme")
+        end
+      end, { desc = "Pick colorscheme" })
+    end,
+  },
+}

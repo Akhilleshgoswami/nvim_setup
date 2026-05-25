@@ -1,260 +1,579 @@
 -- ============================================================
 --  lua/akhilesh/plugins/snacks.lua
+--  Ultra Geeky Snacks Config
 -- ============================================================
 
 return {
   "folke/snacks.nvim",
-  priority = 1000,
-  lazy     = false,
 
-  ---@type snacks.Config
+  priority = 1000,
+  lazy = false,
+
   opts = {
 
-    -- ── Core modules ─────────────────────────────────────────
-    animate      = { enabled = true },
-    bigfile      = { enabled = true },
-    bufdelete    = { enabled = true },
-    debug        = { enabled = false },
-    dim          = { enabled = true },
-    git          = { enabled = true },
-    gitbrowse    = { enabled = true },
-    indent       = { enabled = true },
-    input        = { enabled = true },
-    lazygit      = { enabled = true },
-    notify       = { enabled = true },
-    quickfile    = { enabled = true },
-    rename       = { enabled = false },
-    scope        = { enabled = true },
-    scroll       = { enabled = true },
-    statuscolumn = { enabled = true },
-    terminal     = { enabled = true },
-    toggle       = { enabled = true },
-    win          = { enabled = true },
-    words        = { enabled = true },
-    zen          = { enabled = true },
+    -- ========================================================
+    -- CORE
+    -- ========================================================
 
-    -- ── Notifier ─────────────────────────────────────────────
+    animate = {
+      enabled = true,
+      duration = 20,
+      easing = "linear",
+    },
+
+    bigfile = {
+      enabled = true,
+      size = 1.5 * 1024 * 1024,
+    },
+
+    bufdelete = {
+      enabled = true,
+    },
+
+    debug = {
+      enabled = false,
+    },
+
+    dim = {
+      enabled = true,
+      scope = {
+        min_size = 5,
+        max_size = 20,
+      },
+    },
+
+    git = {
+      enabled = true,
+    },
+
+    gitbrowse = {
+      enabled = true,
+    },
+
+    indent = {
+      enabled = false,
+
+      indent = {
+        enabled = true,
+        char = "▏",
+      },
+
+      animate = {
+        enabled = false,
+      },
+
+      scope = {
+        enabled = false,
+        underline = false,
+        only_current = false,
+        char = "▎",
+      },
+    },
+
+    input = {
+      enabled = true,
+    },
+
+    lazygit = {
+      enabled = true,
+      configure = true,
+    },
+
+    notify = {
+      enabled = true,
+      timeout = 3000,
+    },
+
     notifier = {
       enabled = true,
       timeout = 3000,
-      style   = "fancy",
+      width = { min = 30, max = 120 },
+      height = { min = 1, max = 20 },
+      margin = { top = 1, right = 2, bottom = 1 },
+      padding = true,
+      sort = { "level", "added" },
+      style = "fancy",
     },
 
-    -- ── Styles ───────────────────────────────────────────────
-    styles = {
-      notification = {
-        wo = { wrap = true },
-      },
-      lazygit = {
-        width  = 0,
-        height = 0,
-      },
+    quickfile = {
+      enabled = true,
     },
 
-    -- ── Picker ───────────────────────────────────────────────
-    picker = {
-      actions = {
-        sidekick_send = function(...)
-          return require("sidekick.cli.picker.snacks").send(...)
-        end,
-      },
-      win = {
-        input = {
-          keys = {
-            ["<A-a>"] = { "sidekick_send", mode = { "n", "i" } },
-          },
+    rename = {
+      enabled = true,
+    },
+
+    scope = {
+      enabled = true,
+    },
+
+    scroll = {
+      enabled = true,
+
+      animate = {
+        duration = {
+          step = 15,
+          total = 180,
         },
       },
-      sources = {
-        explorer = { focus = "input" },
+    },
+
+    statuscolumn = {
+      enabled = false,
+
+      left = {
+        "mark",
+        "sign",
       },
-      formatters = {
-        file = { truncate = 100 },
+
+      right = {
+        "fold",
+        "git",
       },
-      layout = {
-        preset  = "telescope",
-        reverse = false,
-        preview = true,
+
+      folds = {
+        open = true,
+        git_hl = true,
+      },
+
+      git = {
+        patterns = { "GitSign" },
       },
     },
 
-    -- ── Dashboard ────────────────────────────────────────────
+    terminal = {
+      enabled = true,
+
+      win = {
+        style = "terminal",
+        border = "rounded",
+      },
+    },
+
+    toggle = {
+      enabled = true,
+    },
+
+    win = {
+      enabled = true,
+
+      backdrop = 60,
+
+      wo = {
+        winblend = 0,
+      },
+    },
+
+    words = {
+      enabled = true,
+
+      debounce = 200,
+
+      notify_jump = true,
+    },
+
+    zen = {
+      enabled = true,
+
+      toggles = {
+        dim = true,
+        git_signs = false,
+        mini_diff_signs = false,
+        diagnostics = false,
+        inlay_hints = false,
+      },
+
+      show = {
+        statusline = false,
+        tabline = false,
+      },
+
+      win = {
+        backdrop = {
+          transparent = false,
+          blend = 95,
+        },
+
+        width = 0.75,
+      },
+    },
+
+    -- ========================================================
+    -- STYLES
+    -- ========================================================
+
+    styles = {
+
+      notification = {
+        border = "rounded",
+
+        wo = {
+          wrap = true,
+          winblend = 10,
+        },
+      },
+
+      lazygit = {
+        width = 0.95,
+        height = 0.95,
+        border = "rounded",
+      },
+
+      terminal = {
+        border = "rounded",
+      },
+
+      input = {
+        relative = "cursor",
+        row = 1,
+        col = 0,
+      },
+
+      scratch = {
+        border = "rounded",
+      },
+    },
+
+    -- ========================================================
+    -- DASHBOARD
+    -- ========================================================
+
     dashboard = {
+
       preset = {
+
         header = [[
-        ███╗   ██╗██╗   ██╗      ██╗██████╗ ███████╗
-        ████╗  ██║██║   ██║      ██║██╔══██╗██╔════╝
-        ██╔██╗ ██║██║   ██║█████╗██║██║  ██║█████╗
-        ██║╚██╗██║╚██╗ ██╔╝╚════╝██║██║  ██║██╔══╝
-        ██║ ╚████║ ╚████╔╝       ██║██████╔╝███████╗
-        ╚═╝  ╚═══╝  ╚═══╝        ╚═╝╚═════╝ ╚══════╝]],
+
+███╗   ██╗██╗   ██╗██╗███╗   ███╗
+████╗  ██║██║   ██║██║████╗ ████║
+██╔██╗ ██║██║   ██║██║██╔████╔██║
+██║╚██╗██║╚██╗ ██╔╝██║██║╚██╔╝██║
+██║ ╚████║ ╚████╔╝ ██║██║ ╚═╝ ██║
+╚═╝  ╚═══╝  ╚═══╝  ╚═╝╚═╝     ╚═╝
+
+    AKHILESH'S CYBER TERMINAL
+
+]],
 
         keys = {
-          { icon = " ",  key = "e", desc = "New file",      action = ":ene | startinsert" },
-          { icon = "ﭯ ", key = "o", desc = "Recent files",  action = ":lua Snacks.dashboard.pick('oldfiles')" },
-          -- function() ensures seeker.nvim is loaded lazily on click
-          { icon = " ",  key = "f", desc = "Find file",     action = function() vim.cmd("Seeker files") end },
-          { icon = " ",  key = "r", desc = "Find word",     action = function() vim.cmd("Seeker grep") end },
-          { icon = " ",  key = "g", desc = "Git status",    action = ":lua Snacks.dashboard.pick('git_status')" },
-          { icon = " ",  key = "p", desc = "Find project",  action = ":Telescope repo list",
-            enabled = package.loaded["telescope"] ~= nil },
-          { icon = " ",  key = "m", desc = "Marks",         action = ":HauntList" },
-          { icon = " ",  key = "t", desc = "Todo",          action = ":TodoTrouble" },
-          { icon = " ",  key = "s", desc = "Plugin config", action = ":e ~/.config/nvim/lua/plugins/init.lua" },
-          { icon = " ",  key = "z", desc = "ZSH config",    action = ":e ~/.zshrc" },
-          { icon = "󰒲 ", key = "u", desc = "Lazy sync",     action = ":Lazy sync",
-            enabled = package.loaded.lazy ~= nil },
-          { icon = " ",  key = "q", desc = "Quit",          action = ":qa" },
+
+          {
+            icon = " ",
+            key = "e",
+            desc = "New File",
+            action = ":ene | startinsert",
+          },
+
+          {
+            icon = "󰱼 ",
+            key = "f",
+            desc = "Find Files",
+            action = function()
+              Snacks.picker.files()
+            end,
+          },
+
+          {
+            icon = "󰱼 ",
+            key = "g",
+            desc = "Live Grep",
+            action = function()
+              Snacks.picker.grep()
+            end,
+          },
+
+          {
+            icon = "󰋚 ",
+            key = "r",
+            desc = "Recent Files",
+            action = function()
+              Snacks.picker.recent()
+            end,
+          },
+
+          {
+            icon = "󰘬 ",
+            key = "p",
+            desc = "Projects",
+            action = function()
+              Snacks.picker.projects()
+            end,
+          },
+
+          {
+            icon = "󰒲 ",
+            key = "l",
+            desc = "Lazy",
+            action = ":Lazy",
+          },
+
+          {
+            icon = "󰊢 ",
+            key = "q",
+            desc = "Quit",
+            action = ":qa",
+          },
         },
       },
 
       sections = {
-        { section = "header" },
-        { section = "keys",         gap = 1, padding = 1 },
-        { section = "recent_files", icon = " ", title = "Recent Files", indent = 2, padding = 1 },
-        { section = "projects",     icon = " ", title = "Projects",     indent = 2, padding = 1 },
-        { section = "startup",      padding = 1 },
 
-        -- pane 2: git browse shortcut
+        { section = "header" },
+
         {
-          pane    = 2,
-          icon    = " ",
-          desc    = "Browse Repo",
-          key     = "b",
-          padding = 1,
-          action  = function() Snacks.gitbrowse() end,
+          section = "keys",
+          gap = 1,
+          padding = 2,
         },
 
-        -- pane 2: live git terminal widgets
-        function()
-          local in_git = Snacks.git.get_root() ~= nil
-          local cmds = {
-            {
-              icon   = " ",
-              title  = "Git Status",
-              cmd    = "git --no-pager diff --stat -B -M -C",
-              height = 10,
+        {
+          icon = "󰋚 ",
+          title = "Recent Files",
+          section = "recent_files",
+          indent = 2,
+          padding = 1,
+        },
+
+        {
+          icon = "󰘬 ",
+          title = "Projects",
+          section = "projects",
+          indent = 2,
+          padding = 1,
+        },
+
+        {
+          section = "startup",
+          padding = 1,
+        },
+      },
+    },
+
+    -- ========================================================
+    -- PICKER
+    -- ========================================================
+
+    picker = {
+
+      enabled = true,
+
+      layout = {
+        preset = "ivy",
+      },
+
+      matcher = {
+        fuzzy = true,
+        smartcase = true,
+        ignorecase = true,
+        sort_empty = false,
+      },
+
+      ui_select = true,
+
+      formatters = {
+
+        file = {
+          truncate = 120,
+        },
+      },
+
+      win = {
+
+        input = {
+
+          keys = {
+
+            ["<Esc>"] = {
+              "close",
+              mode = { "n", "i" },
             },
-            {
-              icon   = " ",
-              title  = "Open Issues",
-              cmd    = "gh issue list -L 3",
-              key    = "i",
-              height = 7,
-              action = function() vim.fn.jobstart("gh issue list --web", { detach = true }) end,
+
+            ["<C-j>"] = {
+              "list_down",
+              mode = { "i", "n" },
             },
-            {
-              icon   = " ",
-              title  = "Open PRs",
-              cmd    = "gh pr list -L 3",
-              key    = "P",
-              height = 7,
-              action = function() vim.fn.jobstart("gh pr list --web", { detach = true }) end,
+
+            ["<C-k>"] = {
+              "list_up",
+              mode = { "i", "n" },
             },
-          }
-          return vim.tbl_map(function(cmd)
-            return vim.tbl_extend("force", {
-              pane    = 2,
-              section = "terminal",
-              enabled = in_git,
-              padding = 1,
-              ttl     = 5 * 60,
-              indent  = 3,
-            }, cmd)
-          end, cmds)
-        end,
+
+            ["<C-q>"] = {
+              "qflist",
+              mode = { "i", "n" },
+            },
+          },
+        },
       },
     },
   },
 
-  -- ── Keymaps ──────────────────────────────────────────────
+  -- ==========================================================
+  -- KEYMAPS
+  -- ==========================================================
+
   keys = {
-    -- Notifications
-    { "<leader>un",  function() Snacks.notifier.hide() end,                desc = "Dismiss notifications" },
 
-    -- Buffers
-    { "<leader>bd",  function() Snacks.bufdelete() end,                    desc = "Delete buffer" },
-    { "<leader>bda", function() Snacks.bufdelete.all() end,                desc = "Delete all buffers" },
-    { "<leader>bdo", function() Snacks.bufdelete.other() end,              desc = "Delete other buffers" },
+    -- FILES
+    {
+      "<leader>ff",
+      function()
+        Snacks.picker.files()
+      end,
+      desc = "Find files",
+    },
 
-    -- Git
-    { "<leader>gg",  function() Snacks.lazygit() end,                      desc = "Lazygit" },
-    { "<leader>gb",  function() Snacks.git.blame_line() end,               desc = "Git blame line" },
-    { "<leader>gB",  function() Snacks.gitbrowse() end,                    desc = "Git browse" },
-    { "<leader>gf",  function() Snacks.lazygit.log_file() end,             desc = "Lazygit file history" },
-    { "<leader>gl",  function() Snacks.lazygit.log() end,                  desc = "Lazygit log" },
+    {
+      "<leader>fg",
+      function()
+        Snacks.picker.grep()
+      end,
+      desc = "Live grep",
+    },
 
-    -- GitHub PRs
-    { "<leader>gpr",  function() Snacks.terminal("gh pr list && echo 'Press enter...'; read") end, desc = "PR list" },
-    { "<leader>gprc", function() Snacks.terminal("gh pr create") end,                              desc = "PR create" },
-    { "<leader>gprm", function() Snacks.terminal("gh pr ready ; gh pr merge") end,                 desc = "PR merge" },
+    {
+      "<leader>fr",
+      function()
+        Snacks.picker.recent()
+      end,
+      desc = "Recent files",
+    },
 
-    -- GitHub Issues
-    { "<leader>gil",  function() Snacks.terminal("gh issue list && echo 'Press enter...'; read") end, desc = "Issue list" },
-    { "<leader>gio",  function() Snacks.terminal("gh issue create") end,                               desc = "Issue create" },
-    { "<leader>gic",  function()
-        local n = vim.fn.input("Issue number → ")
-        if n ~= "" then Snacks.terminal("gh issue close " .. n) end
-      end, desc = "Issue close" },
+    {
+      "<leader>fp",
+      function()
+        Snacks.picker.projects()
+      end,
+      desc = "Projects",
+    },
 
-    -- Terminal
-    { "<leader>x",   function() Snacks.terminal() end,                          desc = "Toggle terminal" },
-    { "<leader>ld",  function() Snacks.terminal("lazydocker") end,              desc = "Lazydocker" },
-    { "<leader>ob",  function() Snacks.terminal("overmind connect backend") end, desc = "Overmind backend" },
+    -- EXPLORER
+    {
+      "<leader>e",
+      function()
+        Snacks.explorer()
+      end,
+      desc = "Explorer",
+    },
 
-    -- Scratch
-    { "<leader>.",   function() Snacks.scratch() end,                      desc = "Scratch buffer" },
-    { "<leader>S",   function() Snacks.scratch.select() end,               desc = "Select scratch" },
+    -- GIT
+    {
+      "<leader>gg",
+      function()
+        Snacks.lazygit()
+      end,
+      desc = "Lazygit",
+    },
 
-    -- Misc
-    { "<F8>",        function() Snacks.zen() end,                          desc = "Zen mode" },
-    { "]]",          function() Snacks.words.jump(vim.v.count1) end,       desc = "Next reference" },
-    { "[[",          function() Snacks.words.jump(-vim.v.count1) end,      desc = "Prev reference" },
+    {
+      "<leader>gb",
+      function()
+        Snacks.git.blame_line()
+      end,
+      desc = "Git blame",
+    },
 
-    -- Picker
-    { "<leader>b",   function() Snacks.picker.buffers({ layout = { preset = "vscode" } }) end,                        desc = "Buffers" },
-    { "<leader>e",   function() Snacks.picker.explorer() end,                                                          desc = "Explorer" },
-    { "<leader>fp",  function() Snacks.picker.git_files() end,                                                         desc = "Git files" },
-    { "<leader>g",   function() Snacks.picker.git_status() end,                                                        desc = "Git status" },
-    { "<leader>l",   function() Snacks.picker.lines() end,                                                             desc = "Buffer lines" },
-    { "<leader>rb",  function() Snacks.picker.grep_buffers() end,                                                      desc = "Grep open buffers" },
-    { "<leader>#",   function() Snacks.picker.grep_word() end,   mode = { "n", "x" },                                 desc = "Grep word / selection" },
-    { "<leader>y",   function() Snacks.picker.registers({ layout = { preset = "vscode" } }) end,                      desc = "Registers" },
-    { "<leader>sj",  function() Snacks.picker.jumps({ layout = { preset = "vscode" } }) end,                          desc = "Jumps" },
-    { "<leader>p",   function() Snacks.picker.projects() end,                                                          desc = "Projects" },
-    { "<leader>z",   function() Snacks.picker.zoxide() end,                                                            desc = "Zoxide" },
-    { "<leader>ss",  function() Snacks.picker.lsp_symbols({ layout = { preset = "vscode", preview = "main" } }) end, desc = "LSP symbols" },
-    { "<leader>sS",  function() Snacks.picker.lsp_workspace_symbols() end,                                             desc = "LSP workspace symbols" },
+    {
+      "<leader>go",
+      function()
+        Snacks.gitbrowse()
+      end,
+      desc = "Git browse",
+    },
 
-    -- GitHub picker
-    { "<leader>gi",  function() Snacks.picker.gh_issue() end,                    desc = "GitHub issues (open)" },
-    { "<leader>gI",  function() Snacks.picker.gh_issue({ state = "all" }) end,   desc = "GitHub issues (all)" },
-    { "<leader>gp",  function() Snacks.picker.gh_pr() end,                       desc = "GitHub PRs (open)" },
-    { "<leader>gP",  function() Snacks.picker.gh_pr({ state = "all" }) end,      desc = "GitHub PRs (all)" },
+    -- TERMINAL
+    {
+      "<leader>tt",
+      function()
+        Snacks.terminal()
+      end,
+      desc = "Terminal",
+    },
 
-    -- LSP go-to (via picker)
-    { "gd",  function() Snacks.picker.lsp_definitions() end,      desc = "Go to definition" },
-    { "gD",  function() Snacks.picker.lsp_declarations() end,     desc = "Go to declaration" },
-    { "gr",  function() Snacks.picker.lsp_references() end,       nowait = true, desc = "References" },
-    { "gI",  function() Snacks.picker.lsp_implementations() end,  desc = "Go to implementation" },
-    { "gy",  function() Snacks.picker.lsp_type_definitions() end, desc = "Go to type definition" },
+    {
+      "<leader>td",
+      function()
+        Snacks.terminal("lazydocker")
+      end,
+      desc = "Lazydocker",
+    },
+
+    -- BUFFERS
+    {
+      "<leader>bd",
+      function()
+        Snacks.bufdelete()
+      end,
+      desc = "Delete buffer",
+    },
+
+    -- ZEN
+    {
+      "<leader>z",
+      function()
+        Snacks.zen()
+      end,
+      desc = "Zen mode",
+    },
+
+    -- NOTIFY
+    {
+      "<leader>un",
+      function()
+        Snacks.notifier.hide()
+      end,
+      desc = "Dismiss notifications",
+    },
+
+    -- WORDS
+    {
+      "]]",
+      function()
+        Snacks.words.jump(vim.v.count1)
+      end,
+      desc = "Next reference",
+    },
+
+    {
+      "[[",
+      function()
+        Snacks.words.jump(-vim.v.count1)
+      end,
+      desc = "Prev reference",
+    },
   },
 
-  -- ── Init (VeryLazy toggles) ───────────────────────────────
+  -- ==========================================================
+  -- INIT
+  -- ==========================================================
+
   init = function()
+
     vim.api.nvim_create_autocmd("User", {
-      pattern  = "VeryLazy",
+      pattern = "VeryLazy",
+
       callback = function()
-        Snacks.toggle.treesitter():map("<leader>uT")
-        Snacks.toggle.option("background", {
-          off  = "light",
-          on   = "dark",
-          name = "Dark Background",
-        }):map("<leader>ub")
+
+        Snacks.toggle.option("wrap", {
+          name = "Wrap",
+        }):map("<leader>uw")
+
+        Snacks.toggle.option("spell", {
+          name = "Spell",
+        }):map("<leader>us")
+
+        Snacks.toggle.option("relativenumber", {
+          name = "Relative Number",
+        }):map("<leader>uL")
+
         Snacks.toggle.dim():map("<leader>uD")
+
         Snacks.toggle.zen():map("<leader>uZ")
+
         Snacks.toggle.scroll():map("<leader>uS")
+
         Snacks.toggle.indent():map("<leader>uI")
+
         Snacks.toggle.words():map("<leader>uW")
       end,
     })
