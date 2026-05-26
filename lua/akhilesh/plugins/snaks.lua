@@ -238,7 +238,7 @@ return {
           hidden = true,
         })
       end, desc = "Project-wide jump (grep every file)" },
-    { "<leader>e",  function() Snacks.explorer()             end, desc = "Explorer" },
+      { "<leader>e",  function() Snacks.explorer()             end, desc = "Explorer" },
     { "<leader>gg", function() Snacks.lazygit()              end, desc = "Lazygit" },
     { "<leader>gb", function() Snacks.git.blame_line()       end, desc = "Git blame" },
     { "<leader>go", function() Snacks.gitbrowse()            end, desc = "Git browse" },

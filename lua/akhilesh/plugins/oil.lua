@@ -8,8 +8,8 @@ return {
   },
 
   keys = {
-    { "-", "<cmd>Oil<CR>", desc = "Oil" },
-    { "<leader>e", "<cmd>Oil --float<CR>", desc = "Explorer" },
+    { "-", "<cmd>Oil --float<CR>", desc = "Oil Float" },
+    { "<leader>oe", "<cmd>Oil --float<CR>", desc = "Explorer" },
   },
 
   opts = {
@@ -19,43 +19,82 @@ return {
     skip_confirm_for_simple_edits = true,
 
     -- ======================================================
-    -- UI
+    -- COLUMNS
     -- ======================================================
 
     columns = {
-      { "icon" },
-      -- remove size/date clutter
+      {
+        "icon",
+        default_file = "󰈔",
+        directory = "󰉋",
+      },
     },
 
-    win_options = {
-      signcolumn = "no",
-      foldcolumn = "0",
-      number = false,
-      relativenumber = false,
-      cursorcolumn = false,
-      wrap = false,
-      winblend = 0,
-    },
+    -- ======================================================
+    -- VIEW
+    -- ======================================================
 
     view_options = {
       show_hidden = true,
       natural_order = true,
+      is_hidden_file = function(name)
+        return vim.startswith(name, ".")
+      end,
     },
 
+    -- ======================================================
+    -- FLOAT WINDOW
+    -- ======================================================
+
     float = {
-      padding = 3,
-      max_width = 90,
-      max_height = 35,
+      padding = 2,
+
+      max_width = 100,
+      max_height = 36,
+
       border = "rounded",
+
+      win_options = {
+        winblend = 8,
+      },
     },
 
     preview = {
       border = "rounded",
+      win_options = {
+        winblend = 8,
+      },
+    },
+
+    -- ======================================================
+    -- WINDOW OPTIONS
+    -- ======================================================
+
+    win_options = {
+      signcolumn = "no",
+      foldcolumn = "0",
+
+      number = false,
+      relativenumber = false,
+
+      cursorline = true,
+      cursorcolumn = false,
+
+      wrap = false,
+      spell = false,
+
+      list = false,
+
+      winblend = 0,
+
+      colorcolumn = "0",
     },
 
     -- ======================================================
     -- KEYMAPS
     -- ======================================================
+
+    use_default_keymaps = false,
 
     keymaps = {
       ["q"] = "actions.close",
@@ -66,6 +105,8 @@ return {
 
       ["h"] = "actions.parent",
 
+      ["-"] = "actions.parent",
+
       ["<C-v>"] = {
         "actions.select",
         opts = { vertical = true },
@@ -75,59 +116,104 @@ return {
         "actions.select",
         opts = { horizontal = true },
       },
-
       ["."] = "actions.toggle_hidden",
 
       ["<C-r>"] = "actions.refresh",
-    },
 
-    use_default_keymaps = false,
+      ["gd"] = {
+        desc = "Toggle detail view",
+        callback = function()
+          detail = not detail
+          if detail then
+            require("oil").set_columns({
+              "icon",
+              "permissions",
+              "size",
+              "mtime",
+            })
+          else
+            require("oil").set_columns({ "icon" })
+          end
+        end,
+      },
+    },
   },
 
   config = function(_, opts)
     require("oil").setup(opts)
 
     -- ======================================================
-    -- THEME
+    -- HIGHLIGHTS
     -- ======================================================
 
-    vim.api.nvim_set_hl(0, "OilDir", {
+    local set = vim.api.nvim_set_hl
+
+    -- main bg
+    set(0, "OilFloat", {
+      bg = "#11131a",
+    })
+
+    -- border
+    set(0, "OilBorder", {
+      fg = "#2f334d",
+      bg = "#11131a",
+    })
+
+    -- directories
+    set(0, "OilDir", {
       fg = "#7aa2f7",
       bold = true,
     })
 
-    vim.api.nvim_set_hl(0, "OilFile", {
+    -- files
+    set(0, "OilFile", {
       fg = "#c0caf5",
     })
 
-    vim.api.nvim_set_hl(0, "OilHidden", {
+    -- hidden files
+    set(0, "OilHidden", {
       fg = "#565f89",
+      italic = true,
     })
 
-    vim.api.nvim_set_hl(0, "OilCopy", {
-      fg = "#e0af68",
-    })
-
-    vim.api.nvim_set_hl(0, "OilMove", {
+    -- permissions/details
+    set(0, "OilPermissions", {
       fg = "#7dcfff",
     })
 
-    vim.api.nvim_set_hl(0, "OilChange", {
-      fg = "#bb9af7",
+    -- copy
+    set(0, "OilCopy", {
+      fg = "#e0af68",
     })
 
-    vim.api.nvim_set_hl(0, "OilDelete", {
+    -- move
+    set(0, "OilMove", {
+      fg = "#7dcfff",
+    })
+
+    -- delete
+    set(0, "OilDelete", {
       fg = "#f7768e",
     })
 
-    -- transparent background
-    vim.api.nvim_set_hl(0, "OilFloat", {
-      bg = "NONE",
+    -- change
+    set(0, "OilChange", {
+      fg = "#bb9af7",
     })
 
-    vim.api.nvim_set_hl(0, "OilBorder", {
-      fg = "#3b4261",
-      bg = "NONE",
+    -- cursorline
+    set(0, "CursorLine", {
+      bg = "#1a1d2a",
+    })
+
+    -- rounded popup harmony
+    set(0, "FloatBorder", {
+      fg = "#2f334d",
+      bg = "#11131a",
+    })
+
+    set(0, "NormalFloat", {
+      bg = "#11131a",
     })
   end,
 }

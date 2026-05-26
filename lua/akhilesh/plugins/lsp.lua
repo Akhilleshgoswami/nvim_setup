@@ -2,7 +2,6 @@ return {
   "neovim/nvim-lspconfig",
 
   dependencies = {
-
     -- ========================================================
     -- MASON
     -- ========================================================
@@ -12,9 +11,9 @@ return {
         ui = {
           border = "rounded",
           icons = {
-            package_installed = " ",
-            package_pending = " ",
-            package_uninstalled = " ",
+            package_installed = "󰄳",
+            package_pending = "󰦬",
+            package_uninstalled = "󰚌",
           },
         },
       },
@@ -31,7 +30,7 @@ return {
       opts = {
         progress = {
           display = {
-            done_icon = " ",
+            done_icon = "󰄳",
             progress_icon = { pattern = "dots" },
           },
         },
@@ -53,18 +52,15 @@ return {
     { "hrsh7th/cmp-buffer" },
     { "hrsh7th/cmp-path" },
     { "hrsh7th/cmp-cmdline" },
-
     { "L3MON4D3/LuaSnip" },
     { "saadparwaiz1/cmp_luasnip" },
     { "rafamadriz/friendly-snippets" },
-
     { "onsails/lspkind.nvim" },
   },
 
   config = function()
-
     -- ========================================================
-    -- DIAGNOSTICS (FIXED)
+    -- DIAGNOSTICS
     -- ========================================================
     vim.diagnostic.config({
       underline = true,
@@ -85,18 +81,7 @@ return {
     })
 
     -- ========================================================
-    -- LSP UI HANDLERS
-    -- ========================================================
-    local border = "rounded"
-
-    vim.lsp.handlers["textDocument/hover"] =
-      vim.lsp.with(vim.lsp.handlers.hover, { border = border })
-
-    vim.lsp.handlers["textDocument/signatureHelp"] =
-      vim.lsp.with(vim.lsp.handlers.signature_help, { border = border })
-
-    -- ========================================================
-    -- CMP SETUP
+    -- CMP
     -- ========================================================
     local cmp = require("cmp")
     local luasnip = require("luasnip")
@@ -150,9 +135,9 @@ return {
     -- SERVERS
     -- ========================================================
     local servers = {
-
       lua_ls = {
         capabilities = capabilities,
+
         settings = {
           Lua = {
             diagnostics = {
@@ -168,13 +153,18 @@ return {
 
       ts_ls = {
         capabilities = capabilities,
+
         settings = {
-          javascript = { validate = true },
-          typescript = { validate = true },
+          javascript = {
+            validate = true,
+          },
+
+          typescript = {
+            validate = true,
+          },
         },
       },
 
-      -- 🔥 IMPORTANT: ESLINT (THIS FIXES YOUR ISSUE)
       eslint = {
         capabilities = capabilities,
       },
@@ -185,21 +175,34 @@ return {
     -- ========================================================
     vim.api.nvim_create_autocmd("LspAttach", {
       callback = function(event)
-
         local map = function(keys, func, desc)
           vim.keymap.set("n", keys, func, {
             buffer = event.buf,
-            desc = "LSP: " .. desc,
+            noremap = true,
+            silent = true,
+            desc = desc,
           })
         end
 
-        -- diagnostics (THIS FIXES POPUP + QUICKFIX)
-        map("<leader>e", vim.diagnostic.open_float, "Show Diagnostics")
+        -- ====================================================
+        -- NAVIGATION
+        -- ====================================================
+        map("gd", vim.lsp.buf.definition, "Go to Definition")
+        map("gr", vim.lsp.buf.references, "Go to References")
+        map("gI", vim.lsp.buf.implementation, "Go to Implementation")
+        map("gy", vim.lsp.buf.type_definition, "Go to Type Definition")
+
+        -- ====================================================
+        -- DIAGNOSTICS
+        -- ====================================================
+        map("<leader>de", vim.diagnostic.open_float, "Show Diagnostics")
         map("[d", vim.diagnostic.goto_prev, "Prev Diagnostic")
         map("]d", vim.diagnostic.goto_next, "Next Diagnostic")
         map("<leader>q", vim.diagnostic.setloclist, "Diagnostics List")
 
-        -- lsp actions
+        -- ====================================================
+        -- LSP ACTIONS
+        -- ====================================================
         map("K", vim.lsp.buf.hover, "Hover")
         map("<leader>rn", vim.lsp.buf.rename, "Rename")
         map("<leader>ca", vim.lsp.buf.code_action, "Code Action")
@@ -207,7 +210,7 @@ return {
     })
 
     -- ========================================================
-    -- MASON INSTALL
+    -- MASON
     -- ========================================================
     require("mason").setup()
 
@@ -221,6 +224,9 @@ return {
       },
     })
 
+    -- ========================================================
+    -- LSPCONFIG
+    -- ========================================================
     require("mason-lspconfig").setup({
       ensure_installed = {
         "lua_ls",
@@ -234,9 +240,11 @@ return {
           local opts = servers[server_name] or {
             capabilities = capabilities,
           }
+
           require("lspconfig")[server_name].setup(opts)
         end,
       },
     })
   end,
 }
+
