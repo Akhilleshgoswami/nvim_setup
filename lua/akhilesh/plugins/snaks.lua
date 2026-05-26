@@ -212,7 +212,7 @@ return {
     { "<leader>sw", function() Snacks.picker.grep_word()    end, mode = { "n", "x" }, desc = "Search word under cursor" },
     { "<leader>sf", function() Snacks.picker.files()        end, desc = "Search files" },
     { "<leader>sb", function() Snacks.picker.lines()        end, desc = "Search lines in buffer" },
-    { "<leader>so", function() Snacks.picker.grep_buffers() end, desc = "Search in open buffers" },
+    { "<leader>/", function() Snacks.picker.grep_buffers() end, desc = "Search in open buffers" },
     { "<leader>sr", function() Snacks.picker.resume()       end, desc = "Resume last search" },
     { "<leader>sh", function() Snacks.picker.help()         end, desc = "Search help" },
     { "<leader>sk", function() Snacks.picker.keymaps()      end, desc = "Search keymaps" },

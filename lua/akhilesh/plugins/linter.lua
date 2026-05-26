@@ -1,256 +1,498 @@
 -- ============================================================
---  lua/akhilesh/plugins/nvim-lint.lua
---  Modern + Theme Adaptive + Clean Lint UI
+--  lua/akhilesh/plugins/luaLine.lua
+--  NEXUS // ELITE CYBER STATUSLINE
+--  Ultra Geeky • Premium • Animated Feel
+--  Best-of-best modern Neovim statusline
 -- ============================================================
 
-return {
-  "mfussenegger/nvim-lint",
+local M = {
+  "nvim-lualine/lualine.nvim",
 
-  optional = true,
+  event = "VeryLazy",
 
-  event = {
-    "BufReadPre",
-    "BufNewFile",
+  dependencies = {
+    "nvim-tree/nvim-web-devicons",
+    "folke/noice.nvim",
+    "lewis6991/gitsigns.nvim",
   },
+}
 
-  opts = function()
+function M.config()
+  local lualine = require("lualine")
 
-    -- ========================================================
-    -- THEME COLORS
-    -- ========================================================
+  -- ==========================================================
+  -- CYBERPUNK PALETTE
+  -- ==========================================================
 
-    local function hl(name, attr)
-      local ok, h = pcall(vim.api.nvim_get_hl, 0, {
-        name = name,
-        link = false,
-      })
+  local c = {
+    bg        = "#090b10",
+    bg_dark   = "#0d1117",
+    bg_light  = "#111827",
+    layer     = "#161b22",
 
-      if not ok or not h[attr] then
-        return nil
-      end
+    fg        = "#c9d1d9",
+    muted     = "#6e7681",
 
-      return string.format("#%06x", h[attr])
-    end
+    blue      = "#58a6ff",
+    cyan      = "#76e3ea",
+    green     = "#7ee787",
+    yellow    = "#f2cc60",
+    orange    = "#ff9e64",
+    red       = "#ff7b72",
+    purple    = "#d2a8ff",
+    pink      = "#ff79c6",
+  }
 
-    local colors = {
-      bg      = hl("Normal", "bg") or "#111111",
-      fg      = hl("Normal", "fg") or "#cdd6f4",
+  -- ==========================================================
+  -- MODE SYSTEM
+  -- ==========================================================
 
-      red     = hl("DiagnosticError", "fg") or "#f7768e",
-      yellow  = hl("DiagnosticWarn", "fg") or "#e0af68",
-      blue    = hl("DiagnosticInfo", "fg") or "#7aa2f7",
-      cyan    = hl("DiagnosticHint", "fg") or "#7dcfff",
+  local modes = {
+    n = { name = "NORMAL",  color = c.blue,   icon = "" },
+    i = { name = "INSERT",  color = c.green,  icon = "󰏫" },
+    v = { name = "VISUAL",  color = c.purple, icon = "󰈈" },
+    V = { name = "V-LINE",  color = c.purple, icon = "󰈈" },
+    [""] = { name = "V-BLOCK", color = c.pink, icon = "󰈈" },
+    c = { name = "COMMAND", color = c.yellow, icon = "" },
+    R = { name = "REPLACE", color = c.red,    icon = "󰑕" },
+    t = { name = "TERMINAL",color = c.cyan,   icon = "󰆍" },
+  }
 
-      comment = hl("Comment", "fg") or "#565f89",
-    }
+  local function mode_data()
+    return modes[vim.fn.mode()] or modes.n
+  end
 
-    -- ========================================================
-    -- HIGHLIGHTS
-    -- ========================================================
+  -- ==========================================================
+  -- COMPONENTS
+  -- ==========================================================
 
-    local function set_hl()
-      local set = vim.api.nvim_set_hl
+  local function mode()
+    local m = mode_data()
 
-      set(0, "DiagnosticError", {
-        fg = colors.red,
-      })
-
-      set(0, "DiagnosticWarn", {
-        fg = colors.yellow,
-      })
-
-      set(0, "DiagnosticInfo", {
-        fg = colors.blue,
-      })
-
-      set(0, "DiagnosticHint", {
-        fg = colors.cyan,
-      })
-
-      set(0, "DiagnosticUnderlineError", {
-        undercurl = true,
-        sp = colors.red,
-      })
-
-      set(0, "DiagnosticUnderlineWarn", {
-        undercurl = true,
-        sp = colors.yellow,
-      })
-
-      set(0, "DiagnosticUnderlineInfo", {
-        undercurl = true,
-        sp = colors.blue,
-      })
-
-      set(0, "DiagnosticUnderlineHint", {
-        undercurl = true,
-        sp = colors.cyan,
-      })
-
-      set(0, "FloatBorder", {
-        fg = colors.comment,
-        bg = colors.bg,
-      })
-    end
-
-    set_hl()
-
-    vim.api.nvim_create_autocmd("ColorScheme", {
-      callback = function()
-        vim.schedule(set_hl)
-      end,
-    })
-
-    -- ========================================================
-    -- RETURN CONFIG
-    -- ========================================================
-
-    return {
-
-      linters_by_ft = {
-
-        -- ====================================================
-        -- WEB
-        -- ====================================================
-
-        javascript = { "eslint_d" },
-        typescript = { "eslint_d" },
-
-        javascriptreact = { "eslint_d" },
-        typescriptreact = { "eslint_d" },
-
-        vue = { "eslint_d" },
-
-        -- ====================================================
-        -- LUA
-        -- ====================================================
-
-        lua = { "luacheck" },
-
-        -- ====================================================
-        -- GO
-        -- ====================================================
-
-        go = { "golangcilint" },
-
-        -- ====================================================
-        -- SHELL
-        -- ====================================================
-
-        sh = { "shellcheck" },
-        bash = { "shellcheck" },
-
-        -- ====================================================
-        -- PYTHON
-        -- ====================================================
-
-        python = { "ruff" },
-
-        -- ====================================================
-        -- YAML / JSON
-        -- ====================================================
-
-        yaml = { "yamllint" },
-        json = { "jsonlint" },
-
-        -- ====================================================
-        -- CMAKE
-        -- ====================================================
-
-        cmake = { "cmakelint" },
-      },
-    }
-  end,
-
-  config = function(_, opts)
-
-    local lint = require("lint")
-
-    lint.linters_by_ft = opts.linters_by_ft
-
-    -- ========================================================
-    -- LINT AUTOCMDS
-    -- ========================================================
-
-    vim.api.nvim_create_autocmd({
-      "BufEnter",
-      "BufWritePost",
-      "InsertLeave",
-    }, {
-      callback = function()
-        lint.try_lint()
-      end,
-    })
-
-    -- ========================================================
-    -- MANUAL LINT KEYMAP
-    -- ========================================================
-
-    vim.keymap.set(
-      "n",
-      "<leader>cl",
-      function()
-        lint.try_lint()
-        vim.notify(
-          "󰦨 Lint completed",
-          vim.log.levels.INFO
-        )
-      end,
-      { desc = "Run lint" }
+    return string.format(
+      " %s %s ",
+      m.icon,
+      m.name
     )
+  end
 
-    -- ========================================================
-    -- FLOAT DIAGNOSTICS
-    -- ========================================================
+  local function mode_color()
+    return {
+      fg = c.bg,
+      bg = mode_data().color,
+      gui = "bold",
+    }
+  end
 
-    vim.diagnostic.config({
+  local function cwd()
+    return "󰉋 " .. vim.fn.fnamemodify(vim.fn.getcwd(), ":t")
+  end
 
-      virtual_text = false,
+  local function lsp()
+    local clients = vim.lsp.get_clients({ bufnr = 0 })
 
-      underline = true,
+    if next(clients) == nil then
+      return "󱏎 offline"
+    end
 
-      severity_sort = true,
+    local names = {}
 
-      update_in_insert = false,
+    for _, client in ipairs(clients) do
+      table.insert(names, client.name)
+    end
 
-      signs = {
-        text = {
-          [vim.diagnostic.severity.ERROR] = "●",
-          [vim.diagnostic.severity.WARN]  = "●",
-          [vim.diagnostic.severity.INFO]  = "●",
-          [vim.diagnostic.severity.HINT]  = "●",
+    return "󰒋 " .. table.concat(names, " · ")
+  end
+
+  local function diagnostics()
+    local error = #vim.diagnostic.get(0, {
+      severity = vim.diagnostic.severity.ERROR,
+    })
+
+    local warn = #vim.diagnostic.get(0, {
+      severity = vim.diagnostic.severity.WARN,
+    })
+
+    local hint = #vim.diagnostic.get(0, {
+      severity = vim.diagnostic.severity.HINT,
+    })
+
+    return string.format(
+      "󰅚 %s 󰀪 %s 󰌶 %s",
+      error,
+      warn,
+      hint
+    )
+  end
+
+  local function git()
+    local gs = vim.b.gitsigns_status_dict
+
+    if not gs then
+      return ""
+    end
+
+    return string.format(
+      "󰊢 +%s ~%s -%s",
+      gs.added or 0,
+      gs.changed or 0,
+      gs.removed or 0
+    )
+  end
+
+  local function search()
+    if vim.v.hlsearch == 0 then
+      return ""
+    end
+
+    local ok, s = pcall(vim.fn.searchcount)
+
+    if not ok or s.total == 0 then
+      return ""
+    end
+
+    return string.format(
+      "󰱼 %d/%d",
+      s.current,
+      s.total
+    )
+  end
+
+  local function macro()
+    local reg = vim.fn.reg_recording()
+
+    if reg == "" then
+      return ""
+    end
+
+    return "󰑋 REC @" .. reg
+  end
+
+  local function clock()
+    return "󰥔 " .. os.date("%H:%M")
+  end
+
+  local function os_icon()
+    local sys = vim.loop.os_uname().sysname
+
+    if sys == "Darwin" then
+      return " mac"
+    elseif sys == "Linux" then
+      return " linux"
+    else
+      return " windows"
+    end
+  end
+
+  local function progress_bar()
+    local current = vim.fn.line(".")
+    local total = vim.fn.line("$")
+
+    local chars = {
+      "▁▁▁▁▁",
+      "██▁▁▁",
+      "███▁▁",
+      "████▁",
+      "█████",
+    }
+
+    local i = math.ceil((current / total) * #chars)
+
+    return chars[i]
+  end
+
+  -- ==========================================================
+  -- THEME
+  -- ==========================================================
+
+  local theme = {
+    normal = {
+      a = { fg = c.bg, bg = c.blue, gui = "bold" },
+      b = { fg = c.fg, bg = c.layer },
+      c = { fg = c.muted, bg = c.bg_dark },
+    },
+
+    insert = {
+      a = { fg = c.bg, bg = c.green, gui = "bold" },
+    },
+
+    visual = {
+      a = { fg = c.bg, bg = c.purple, gui = "bold" },
+    },
+
+    replace = {
+      a = { fg = c.bg, bg = c.red, gui = "bold" },
+    },
+
+    command = {
+      a = { fg = c.bg, bg = c.yellow, gui = "bold" },
+    },
+
+    inactive = {
+      a = { fg = c.muted, bg = c.bg_dark },
+      b = { fg = c.muted, bg = c.bg_dark },
+      c = { fg = c.muted, bg = c.bg_dark },
+    },
+  }
+
+  -- ==========================================================
+  -- SETUP
+  -- ==========================================================
+
+  lualine.setup({
+    options = {
+      theme = theme,
+
+      globalstatus = true,
+
+      icons_enabled = true,
+
+      component_separators = {
+        left = "│",
+        right = "│",
+      },
+
+      section_separators = {
+        left = "",
+        right = "",
+      },
+
+      disabled_filetypes = {
+        statusline = {
+          "dashboard",
+          "alpha",
+          "snacks_dashboard",
         },
       },
 
-      float = {
-        border = "rounded",
-        source = "if_many",
-        header = "",
-        prefix = "",
+      always_divide_middle = true,
+    },
+
+    sections = {
+      -- ======================================================
+      -- LEFT
+      -- ======================================================
+
+      lualine_a = {
+        {
+          mode,
+          color = mode_color,
+        },
       },
-    })
 
-    -- ========================================================
-    -- AUTO FLOAT ON CURSOR HOLD
-    -- ========================================================
+      lualine_b = {
+        {
+          cwd,
 
-    vim.api.nvim_create_autocmd("CursorHold", {
-      callback = function()
-        vim.diagnostic.open_float(nil, {
-          focusable = false,
-          close_events = {
-            "BufLeave",
-            "CursorMoved",
-            "InsertEnter",
-            "FocusLost",
+          color = {
+            fg = c.cyan,
+            bg = c.layer,
+            gui = "bold",
+          },
+        },
+
+        {
+          "branch",
+
+          icon = "󰘬",
+
+          color = {
+            fg = c.purple,
+            bg = c.layer,
+          },
+        },
+      },
+
+      lualine_c = {
+        {
+          "filename",
+
+          path = 1,
+
+          symbols = {
+            modified = " ●",
+            readonly = " 󰌾",
+            unnamed = " [No Name]",
           },
 
-          border = "rounded",
-          source = "if_many",
-          prefix = "",
-          scope = "cursor",
-        })
-      end,
-    })
-  end,
-}
+          color = {
+            fg = c.fg,
+            bg = c.bg_dark,
+          },
+        },
+
+        {
+          git,
+
+          color = {
+            fg = c.orange,
+            bg = c.bg_dark,
+          },
+        },
+
+        {
+          diagnostics,
+
+          color = {
+            fg = c.red,
+            bg = c.bg_dark,
+          },
+        },
+
+        {
+          macro,
+
+          color = {
+            fg = c.yellow,
+            bg = c.bg_dark,
+            gui = "bold",
+          },
+        },
+      },
+
+      -- ======================================================
+      -- RIGHT
+      -- ======================================================
+
+      lualine_x = {
+        {
+          search,
+
+          color = {
+            fg = c.yellow,
+          },
+        },
+
+        {
+          lsp,
+
+          color = {
+            fg = c.green,
+            gui = "bold",
+          },
+        },
+
+        {
+          "encoding",
+
+          fmt = string.upper,
+
+          color = {
+            fg = c.muted,
+          },
+        },
+
+        {
+          os_icon,
+
+          color = {
+            fg = c.blue,
+          },
+        },
+
+        {
+          "filetype",
+
+          colored = true,
+
+          icon_only = false,
+
+          color = {
+            fg = c.cyan,
+          },
+        },
+      },
+
+      lualine_y = {
+        {
+          "progress",
+
+          color = {
+            fg = c.cyan,
+            bg = c.layer,
+          },
+        },
+
+        {
+          "location",
+
+          color = {
+            fg = c.bg,
+            bg = c.blue,
+            gui = "bold",
+          },
+        },
+      },
+
+      lualine_z = {
+        {
+          progress_bar,
+
+          color = {
+            fg = c.green,
+            bg = c.layer,
+            gui = "bold",
+          },
+        },
+
+        {
+          clock,
+
+          color = {
+            fg = c.bg,
+            bg = c.purple,
+            gui = "bold",
+          },
+        },
+      },
+    },
+
+    -- ========================================================
+    -- INACTIVE
+    -- ========================================================
+
+    inactive_sections = {
+      lualine_a = {},
+
+      lualine_b = {
+        {
+          "filename",
+          path = 1,
+        },
+      },
+
+      lualine_c = {},
+      lualine_x = {},
+      lualine_y = {},
+      lualine_z = {},
+    },
+
+    extensions = {
+      "lazy",
+      "mason",
+      "oil",
+      "toggleterm",
+      "trouble",
+      "quickfix",
+    },
+  })
+
+  -- ==========================================================
+  -- HIGHLIGHTS
+  -- ==========================================================
+
+  local set = vim.api.nvim_set_hl
+
+  set(0, "StatusLine", {
+    bg = c.bg_dark,
+    fg = c.fg,
+  })
+
+  set(0, "StatusLineNC", {
+    bg = c.bg_dark,
+    fg = c.muted,
+  })
+end
+
+return M
+

@@ -1,4 +1,3 @@
--- lua/akhilesh/plugins/noice.lua
 -- ============================================================
 --  lua/akhilesh/plugins/noice.lua
 --  Ultra Clean + Theme Adaptive + Modern Floating UI
@@ -33,15 +32,18 @@ return {
     end
 
     local colors = {
-      bg      = hl("Normal", "bg") or "#111111",
-      fg      = hl("Normal", "fg") or "#cdd6f4",
-      blue    = hl("Function", "fg") or "#7aa2f7",
-      green   = hl("String", "fg") or "#9ece6a",
-      red     = hl("DiagnosticError", "fg") or "#f7768e",
-      yellow  = hl("Type", "fg") or "#e0af68",
-      purple  = hl("Statement", "fg") or "#bb9af7",
-      cyan    = hl("Keyword", "fg") or "#7dcfff",
-      comment = hl("Comment", "fg") or "#565f89",
+      bg      = hl("Normal",           "bg") or "#0b1020",
+      bg_soft = hl("CursorLine",       "bg") or "#111827",
+      fg      = hl("Normal",           "fg") or "#cdd6f4",
+      blue    = hl("Function",         "fg") or "#7aa2f7",
+      green   = hl("String",           "fg") or "#9ece6a",
+      red     = hl("DiagnosticError",  "fg") or "#f7768e",
+      yellow  = hl("Type",             "fg") or "#e0af68",
+      purple  = hl("Statement",        "fg") or "#bb9af7",
+      cyan    = hl("Keyword",          "fg") or "#7dcfff",
+      orange  = hl("Number",           "fg") or "#ff9e64",
+      comment = hl("Comment",          "fg") or "#565f89",
+      border  = hl("FloatBorder",      "fg") or "#1e293b",
     }
 
     -- ========================================================
@@ -51,71 +53,50 @@ return {
     local function set_hl()
       local set = vim.api.nvim_set_hl
 
-      -- Noice cmdline
-      set(0, "NoiceCmdlinePopup", {
-        bg = colors.bg,
-      })
+      -- Cmdline popup
+      set(0, "NoiceCmdlinePopup",       { bg = colors.bg })
+      set(0, "NoiceCmdlinePopupBorder", { fg = colors.blue,    bg = colors.bg })
+      set(0, "NoiceCmdlinePopupTitle",  { fg = colors.bg,      bg = colors.blue, bold = true })
+      set(0, "NoiceCmdlineIcon",        { fg = colors.cyan })
 
-      set(0, "NoiceCmdlinePopupBorder", {
-        fg = colors.blue,
-        bg = colors.bg,
-      })
-
-      set(0, "NoiceCmdlineIcon", {
-        fg = colors.cyan,
-      })
-
-      set(0, "NoiceCmdlinePopupTitle", {
-        fg = colors.blue,
-        bold = true,
-      })
+      -- Each cmdline kind gets its own accent
+      set(0, "NoiceCmdlineIconSearch",  { fg = colors.yellow })
+      set(0, "NoiceCmdlineIconLua",     { fg = colors.purple })
+      set(0, "NoiceCmdlineIconHelp",    { fg = colors.green })
+      set(0, "NoiceCmdlineIconFilter",  { fg = colors.orange })
 
       -- Popupmenu
-      set(0, "NoicePopupmenu", {
-        bg = colors.bg,
-      })
+      set(0, "NoicePopupmenu",          { bg = colors.bg })
+      set(0, "NoicePopupmenuBorder",    { fg = colors.border,  bg = colors.bg })
+      set(0, "NoicePopupmenuSelected",  { bg = colors.bg_soft, fg = colors.cyan, bold = true })
+      set(0, "NoicePopupmenuMatch",     { fg = colors.yellow,  bold = true })
 
-      set(0, "NoicePopupmenuBorder", {
-        fg = colors.comment,
-        bg = colors.bg,
-      })
+      -- Mini (bottom-right inline messages)
+      set(0, "NoiceMini",               { bg = colors.bg,      fg = colors.comment })
 
-      set(0, "NoicePopupmenuSelected", {
-        bg = "NONE",
-        fg = colors.yellow,
-        bold = true,
-      })
+      -- Confirm dialog
+      set(0, "NoiceConfirmBorder",      { fg = colors.green,   bg = colors.bg })
 
-      -- Mini view
-      set(0, "NoiceMini", {
-        bg = colors.bg,
-      })
+      -- LSP progress
+      set(0, "NoiceLspProgressTitle",   { fg = colors.blue,    bold = true })
+      set(0, "NoiceLspProgressSpinner", { fg = colors.cyan })
+      set(0, "NoiceLspProgressClient",  { fg = colors.purple })
 
-      -- Confirm
-      set(0, "NoiceConfirmBorder", {
-        fg = colors.green,
-        bg = colors.bg,
-      })
+      -- Formatters inside cmdline
+      set(0, "NoiceFormatProgressDone", { fg = colors.green,   bold = true })
+      set(0, "NoiceFormatProgressTodo", { fg = colors.comment })
+      set(0, "NoiceFormatTitle",        { fg = colors.blue,    bold = true })
+      set(0, "NoiceFormatEvent",        { fg = colors.comment, italic = true })
+      set(0, "NoiceFormatKind",         { fg = colors.purple })
+      set(0, "NoiceFormatDate",         { fg = colors.comment, italic = true })
 
-      -- Hover
-      set(0, "NoiceLspProgressTitle", {
-        fg = colors.blue,
-        bold = true,
-      })
+      -- Scrollbar
+      set(0, "NoiceScrollbar",          { bg = colors.bg_soft })
+      set(0, "NoiceScrollbarThumb",     { bg = colors.blue })
 
-      set(0, "NoiceLspProgressSpinner", {
-        fg = colors.cyan,
-      })
-
-      set(0, "NoiceLspProgressClient", {
-        fg = colors.purple,
-      })
-
-      -- Cmdline popup blend
-      set(0, "FloatBorder", {
-        fg = colors.comment,
-        bg = colors.bg,
-      })
+      -- FloatBorder fallback
+      set(0, "FloatBorder",             { fg = colors.border,  bg = colors.bg })
+      set(0, "NormalFloat",             { bg = colors.bg })
     end
 
     set_hl()
@@ -139,30 +120,30 @@ return {
       lsp = {
         override = {
           ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-          ["vim.lsp.util.stylize_markdown"] = true,
-          ["cmp.entry.get_documentation"] = true,
+          ["vim.lsp.util.stylize_markdown"]                = true,
+          ["cmp.entry.get_documentation"]                  = true,
         },
 
         hover = {
           enabled = true,
-          silent = true,
+          silent  = true,
         },
 
         signature = {
           enabled = true,
 
           auto_open = {
-            enabled = true,
-            trigger = true,
-            luasnip = true,
+            enabled  = true,
+            trigger  = true,
+            luasnip  = true,
             throttle = 50,
           },
         },
 
         progress = {
-          enabled = true,
+          enabled  = true,
           throttle = 1000 / 30,
-          view = "mini",
+          view     = "mini",
         },
 
         message = {
@@ -175,11 +156,11 @@ return {
       -- ======================================================
 
       presets = {
-        bottom_search = false,
-        command_palette = false,
+        bottom_search        = false,
+        command_palette      = false,
         long_message_to_split = true,
-        inc_rename = false,
-        lsp_doc_border = true,
+        inc_rename           = false,
+        lsp_doc_border       = true,
       },
 
       -- ======================================================
@@ -188,37 +169,44 @@ return {
 
       cmdline = {
         enabled = true,
-
-        view = "cmdline_popup",
+        view    = "cmdline_popup",
 
         format = {
           cmdline = {
-            icon = "",
-            lang = "vim",
+            icon  = "",
+            lang  = "vim",
           },
 
           search_down = {
-            icon = " ",
-            lang = "regex",
+            icon  = " ",
+            lang  = "regex",
           },
 
           search_up = {
-            icon = " ",
-            lang = "regex",
+            icon  = " ",
+            lang  = "regex",
           },
 
           filter = {
-            icon = "󰈲",
-            lang = "bash",
+            icon  = "󰈲",
+            lang  = "bash",
           },
 
           lua = {
-            icon = "",
-            lang = "lua",
+            icon  = "",
+            lang  = "lua",
           },
 
           help = {
-            icon = "󰋖",
+            icon  = "󰋖",
+          },
+
+          -- extra: substitute command gets a distinct icon
+          substitute = {
+            icon     = "󰛔",
+            lang     = "regex",
+            pattern  = "^:%%?s/",
+            title    = " Replace ",
           },
         },
       },
@@ -228,13 +216,10 @@ return {
       -- ======================================================
 
       messages = {
-        enabled = true,
-
-        view = "mini",
-
-        view_error = "notify",
-        view_warn = "notify",
-
+        enabled     = true,
+        view        = "mini",
+        view_error  = "notify",
+        view_warn   = "notify",
         view_history = "split",
         view_search = "virtualtext",
       },
@@ -254,26 +239,21 @@ return {
 
       notify = {
         enabled = true,
-        view = "notify",
+        view    = "notify",
       },
 
       -- ======================================================
-      -- ROUTES (REMOVE NOISE)
+      -- ROUTES  (suppress noise, redirect long output)
       -- ======================================================
 
       routes = {
-
-        -- Remove INSERT visual spam
+        -- hide INSERT/VISUAL/REPLACE mode text
         {
-          filter = {
-            event = "msg_showmode",
-          },
-          opts = {
-            skip = true,
-          },
+          filter = { event = "msg_showmode" },
+          opts   = { skip = true },
         },
 
-        -- Remove useless file messages
+        -- hide trivial write / yank / motion messages
         {
           filter = {
             event = "msg_show",
@@ -284,22 +264,30 @@ return {
               { find = "%d fewer lines" },
               { find = "%d more lines" },
               { find = "%d lines yanked" },
+              { find = "^%[.*%]$" },        -- e.g. [w], [q]
+              { find = "written$" },
+              { find = "^--" },             -- -- INSERT -- etc
             },
           },
-
-          opts = {
-            skip = true,
-          },
+          opts = { skip = true },
         },
 
-        -- Long outputs -> split
+        -- redirect large outputs to split
         {
           filter = {
-            event = "msg_show",
+            event      = "msg_show",
             min_height = 15,
           },
-
           view = "split",
+        },
+
+        -- send search-count virtualtext, not a floating message
+        {
+          filter = {
+            event  = "msg_show",
+            kind   = "search_count",
+          },
+          opts = { skip = true },
         },
       },
 
@@ -309,7 +297,7 @@ return {
 
       views = {
 
-        -- COMMAND LINE
+        -- COMMAND LINE POPUP
         cmdline_popup = {
           position = {
             row = "88%",
@@ -317,12 +305,12 @@ return {
           },
 
           size = {
-            width = 60,
+            width  = 64,
             height = "auto",
           },
 
           border = {
-            style = "rounded",
+            style   = "rounded",
             padding = { 0, 1 },
           },
 
@@ -332,13 +320,15 @@ return {
             winhighlight = table.concat({
               "Normal:NormalFloat",
               "FloatBorder:NoiceCmdlinePopupBorder",
+              "FloatTitle:NoiceCmdlinePopupTitle",
             }, ","),
           },
         },
 
-        -- MINI MESSAGES
+        -- MINI  (bottom-right, ephemeral messages)
         mini = {
           timeout = 2500,
+          zindex  = 60,
 
           position = {
             row = -2,
@@ -346,22 +336,24 @@ return {
           },
 
           win_options = {
-            winblend = 0,
+            winblend = 20,       -- subtle transparency
+
+            winhighlight = table.concat({
+              "Normal:NoiceMini",
+            }, ","),
           },
         },
 
         -- NOTIFICATIONS
         notify = {
           replace = false,
-          merge = false,
+          merge   = false,
         },
 
-        -- SPLIT
+        -- SPLIT  (long output)
         split = {
-          enter = true,
-
-          size = "20%",
-
+          enter    = true,
+          size     = "22%",
           position = "bottom",
 
           close = {
@@ -369,24 +361,27 @@ return {
           },
         },
 
-        -- HOVER
+        -- HOVER DOC
         hover = {
           border = {
-            style = "rounded",
+            style   = "rounded",
             padding = { 0, 1 },
           },
 
-          position = {
-            row = 2,
-            col = 2,
-          },
+          position = { row = 2, col = 2 },
 
           size = {
-            max_width = 90,
+            max_width  = 90,
+            max_height = 20,
           },
 
           win_options = {
-            winblend = 0,
+            winblend = 8,
+
+            winhighlight = table.concat({
+              "Normal:NormalFloat",
+              "FloatBorder:FloatBorder",
+            }, ","),
           },
         },
 
@@ -395,16 +390,35 @@ return {
           relative = "editor",
 
           border = {
-            style = "rounded",
+            style   = "rounded",
             padding = { 0, 1 },
+          },
+
+          win_options = {
+            winblend = 5,
+
+            winhighlight = table.concat({
+              "Normal:NoicePopupmenu",
+              "FloatBorder:NoicePopupmenuBorder",
+              "CursorLine:NoicePopupmenuSelected",
+            }, ","),
+          },
+        },
+
+        -- CONFIRM DIALOG
+        confirm = {
+          border = {
+            style   = "rounded",
+            padding = { 0, 1 },
+            text    = { top = " Confirm " },
           },
 
           win_options = {
             winblend = 0,
 
             winhighlight = table.concat({
-              "Normal:NoicePopupmenu",
-              "FloatBorder:NoicePopupmenuBorder",
+              "Normal:NormalFloat",
+              "FloatBorder:NoiceConfirmBorder",
             }, ","),
           },
         },
@@ -419,6 +433,10 @@ return {
     }
   end,
 
+  -- ============================================================
+  -- CONFIG
+  -- ============================================================
+
   config = function(_, opts)
     require("noice").setup(opts)
 
@@ -426,26 +444,31 @@ return {
     -- NOTIFY CONFIG
     -- ========================================================
 
-    vim.notify = require("notify")
+    local notify = require("notify")
 
-    require("notify").setup({
-      stages = "fade",
-
-      timeout = 3000,
-
-      render = "wrapped-compact",
-
-      background_colour = "#000000",
-
-      fps = 60,
+    notify.setup({
+      stages           = "slide",     -- snappier than "fade"
+      timeout          = 3000,
+      render           = "wrapped-compact",
+      background_colour = "#0b1020",
+      max_width        = 50,
+      fps              = 60,
+      minimum_width    = 28,
 
       icons = {
-        ERROR = "",
-        WARN  = "",
-        INFO  = "",
-        DEBUG = "",
-        TRACE = "✎",
+        ERROR = " ",
+        WARN  = " ",
+        INFO  = " ",
+        DEBUG = " ",
+        TRACE = "✎ ",
       },
+
+      -- dim old notifications slightly
+      on_open = function(win)
+        vim.api.nvim_win_set_config(win, { focusable = false })
+      end,
     })
+
+    vim.notify = notify
   end,
 }
