@@ -15,7 +15,7 @@
 
 ## Configuration
 
-`lua/plugins/ui-extras.lua` (ufo section)
+`lua/plugins/folds.lua`
 
 Init sets `foldlevel = 99`, `foldenable = true`, `signcolumn = "yes:1"`.
 
@@ -27,10 +27,16 @@ No dedicated commands. Uses fold keymaps below.
 
 | Key | Action |
 |-----|--------|
+| `Space fc` / `Space fe` | Fold / unfold at cursor |
+| `Space fa` | Toggle fold at cursor |
+| `Space fR` / `Space fM` | Open all / close all folds |
+| `Space fk` | Peek fold under cursor |
+| `zc` / `zo` / `za` | Fold / unfold / toggle (Vim keys) |
+| `zC` / `zO` | Fold / unfold recursively |
 | `zR` | Open all folds |
 | `zM` | Close all folds |
 | `zr` | Open folds except imports/comments |
-| `zp` | Peek fold under cursor (or LSP hover) |
+| `zp` | Peek fold (or LSP hover) |
 
 Standard Vim `zc`/`zo`/`za` still work for individual folds.
 

@@ -1,217 +1,244 @@
-# Keymaps README
+# Umbra — Keymap Reference
 
-Leader key: `Space`
+**Leader:** `Space`   ·   **Local leader:** `\`
 
-This file documents the active keymaps in your current NvChad-based setup.
+A handcrafted, keyboard-first Neovim environment. `which-key` shows every
+group live — press `Space` and wait, or `Space ?` for buffer-local maps.
 
-## Core Editing
+---
+
+## Essentials
 
 | Key | Action |
 |---|---|
 | `jk` (insert) | Exit insert mode |
-| `Space w` | Save file |
+| `Esc` | Clear search highlight |
+| `Ctrl-s` | Save file (any mode) |
+| `Space w` / `Space W` | Save file / save all |
 | `Space c` | Close window |
-| `Space nh` | Clear search highlights |
-| `J` | Join line (cursor stable) |
-| `Shift-J` / `Shift-K` (visual) | Move selected lines down/up |
-| `Ctrl-d` / `Ctrl-u` | Scroll down/up and center |
-| `n` / `N` | Next/prev search and center |
-| `Q` | Disabled |
+| `Space Q` | Quit all |
+| `Space ur` | Reload Umbra config |
+| `Space L` | Plugin manager (Lazy) |
 
-## Clipboard / Text
+## Motion & Editing
 
 | Key | Action |
 |---|---|
+| `j` / `k` | Move by display line when wrapped |
+| `n` / `N` | Next/prev search, centered |
+| `J` | Join line, cursor stable |
+| `<` / `>` (visual) | Indent, keep selection |
+| `J` / `K` (visual) | Move selection down/up |
 | `Space y` / `Space Y` | Yank to system clipboard |
 | `Space d` | Delete without yanking |
-| `Space p` (visual) | Paste without replacing register |
+| `Space p` (visual) | Paste, keep register |
+| `s` / `S` | Flash jump / Flash Treesitter |
+| `w` `e` `b` `ge` | Subword-aware motions (spider) |
+| `af`/`if` `ac`/`ic` `aa`/`ia` | Treesitter text objects (func/class/param) |
+| `]f`/`[f` `]c`/`[c` `]a`/`[a` | Next/prev function / class / parameter |
+| `Ctrl-Space` / `Bs` | Grow / shrink Treesitter selection |
 
-## Navigation Lists
-
-| Key | Action |
-|---|---|
-| `Ctrl-j` / `Ctrl-k` | Quickfix prev/next |
-| `Space j` / `Space k` | Loclist prev/next |
-
-## Buffers / Tabs
+## Windows, Splits & Buffers
 
 | Key | Action |
 |---|---|
-| `Tab` | Previous buffer |
-| `Shift-Tab` | Next buffer |
-| `Shift-C` | Close buffer |
-| `Space bd` | Delete buffer (Snacks bufdelete) |
+| `Ctrl-h/j/k/l` | Move between windows (tmux-aware) |
+| `Space sv` / `Space ss` | Split vertical / horizontal |
+| `Space se` / `Space sx` | Equalize / close split |
+| `Space m` | Maximize split (toggle) |
+| `Ctrl-Arrows` | Resize split |
+| `Tab` / `Shift-Tab` | Next / previous buffer |
+| `Space bd` / `Space bo` | Delete buffer / delete others |
+| `Space bp` | Pin buffer |
+| `Space b1/b2/b3` | Jump to buffer by position |
+| `]q`/`[q`  `]l`/`[l` | Quickfix / location list nav |
 
-## Files & Explorer
-
-| Key | Action |
-|---|---|
-| `Space ff` | Find files (NvChad Telescope) |
-| `Space fb` | Buffers (NvChad Telescope) |
-| `Space fo` | Old files (NvChad Telescope) |
-| `Space fw` | Live grep (NvChad Telescope) |
-| `Space e` | Snacks explorer sidebar |
-| `-` | Oil float explorer |
-| `Space oe` | Oil float explorer |
-| `Space pv` | Netrw `:Ex` |
-
-## Snacks Picker (Search)
+## Find — `Space f` (Telescope)
 
 | Key | Action |
 |---|---|
-| `Space fg` | Live grep |
-| `Space fr` | Recent files |
+| `Space Space` / `Space ff` | Find files |
+| `Space fF` | Find all files (hidden + ignored) |
+| `Space fg` / `Space fw` | Live grep / grep word |
+| `Space fb` / `Space fr` | Buffers / recent files |
+| `Space fs` / `Space fS` | Document / workspace symbols |
+| `Space fd` / `Space ft` | Diagnostics / todo comments |
+| `Space fh` `fk` `fc` | Help / keymaps / commands |
+| `Space f/` / `Space fR` | Search in buffer / resume picker |
 | `Space fp` | Projects |
-| `Space sg` | Search in project |
-| `Space sw` | Search word under cursor |
-| `Space sf` | Search files |
-| `Space sb` | Search lines in buffer |
-| `Space sr` | Resume search |
-| `Space sh` | Help tags |
-| `Space sk` | Keymaps |
-| `Space sc` | Commands |
-| `Space sm` | Marks |
-| `Space sR` | Registers |
-| `Space sd` / `Space sD` | Diagnostics (workspace/buffer) |
-| `Space ss` / `Space sS` | LSP symbols (doc/workspace) |
-| `Space sT` | TODO comments |
-| `Space sn` | Notifications |
-| `Space sj` | Jumplist |
-| `Space sJ` | Project-wide jump grep |
-| `<leader>/` | Search in open buffers |
 
-## Git
+## Explorer — one sidebar, three sources
+
+All sources dock in the **same left window** — switching never opens extra
+splits or duplicate buffers.
 
 | Key | Action |
 |---|---|
-| `Space gd` | Diffview open |
-| `Space gc` | Diffview close |
-| `Space q` | Diffview toggle files panel |
-| `Space gg` | Lazygit |
-| `Space gb` | Blame line |
-| `Space go` | Git browse |
-| `Space gl` | Git log picker |
-| `Space gs` | Git status picker |
+| `Space e` / `Space E` | Files sidebar (toggle) / float |
+| `Space be` / `Space ge` | Buffers source / Git status source (same window) |
+| `Tab` / `Shift-Tab` (in tree) | Cycle Files → Buffers → Git in place |
+| `-` / `Space -` | Oil (edit filesystem as buffer) |
 
-### Gitsigns (buffer local)
+**Inside the Git status source** (`Space ge`): `ga` stage file · `gu` unstage ·
+`gr` revert · `A` stage all · `gc` commit · `gp` push · `gg` commit + push ·
+`Enter`/`l` open the file. Filesystem source: `H` toggles hidden files.
 
-| Key | Action |
-|---|---|
-| `]h` / `[h` | Next/prev hunk |
-| `Space hs` / `Space hS` | Stage hunk / stage buffer |
-| `Space hu` | Undo stage hunk |
-| `Space hr` / `Space hR` | Reset hunk / reset buffer |
-| `Space hp` / `Space hi` | Preview hunk / inline preview |
-| `Space hd` / `Space hD` | Diff this / diff against `~` |
-| `Space hb` / `Space hB` | Blame popup / toggle line blame |
-| `Space hx` / `Space hw` / `Space hl` | Toggle deleted / word diff / linehl |
-
-## LSP (buffer local)
+## Harpoon — `Space h`
 
 | Key | Action |
 |---|---|
-| `gd` | Go to definition |
-| `gr` | References |
-| `gI` | Implementation |
-| `gy` | Type definition |
-| `K` | Hover docs |
-| `Space rn` | Rename symbol |
+| `Space ha` | Add file |
+| `Ctrl-e` | Toggle quick menu |
+| `Space hn` / `Space hp` | Next / previous mark |
+| `Space 1`–`Space 4` | Jump to file 1–4 |
+
+## LSP & Code — `Space c`, `Space r`
+
+| Key | Action |
+|---|---|
+| `gd` `gr` `gI` `gy` `gD` | Definition / references / impl / type / declaration |
+| `K` / `Ctrl-k` | Hover / signature help |
 | `Space ca` | Code action |
-| `Space de` | Diagnostic float |
-| `[d` / `]d` | Prev/next diagnostic |
-| `Space q` | Diagnostics to loclist |
-| `Space zig` | Restart LSP |
-| `Space f` | Format via LSP |
+| `Space rn` | Rename (live preview) |
+| `Space cf` / `Space uf` | Format / toggle format-on-save |
+| `Space cd` | Line diagnostics |
+| `]d` / `[d` | Next / prev diagnostic |
+| `Space ch` | Toggle inlay hints |
+| `Space cl` / `Space cr` | Run code lens / restart LSP |
+| `Space cs` / `Space cS` | Swap parameter next / prev |
 
-## Completion (blink.cmp)
-
-| Key | Action |
-|---|---|
-| `Tab` / `Shift-Tab` | Next/prev completion or snippet jump |
-| `Ctrl-Space` | Show completion/docs |
-| `Ctrl-e` | Hide completion |
-| `Ctrl-j` / `Ctrl-k` | Scroll completion docs |
-| `Enter` | Accept completion |
-
-## Motion & Editing Plugins
-
-### Flash
-- `s`, `S`, `r`, `R`, `Ctrl-s` (cmdline)
-
-### Spider
-- `w`, `e`, `b`, `ge` (smart word motions)
-
-### Substitute
-- `Space sr`, `Space sl`, `Space sS`
-- Rip substitute: `Space srf`
-
-### Comment / Surround
-- Comment: `gcc`, `gc`, `gbc`, `gb`
-- Surround: `ys`, `ds`, `cs`
-
-## Harpoon
+## Diagnostics — `Space x` (Trouble)
 
 | Key | Action |
 |---|---|
-| `Space a` | Add file |
-| `Ctrl-m` | Toggle menu |
-| `Ctrl-h` | File 1 |
-| `Ctrl-n` | File 3 |
-| `Ctrl-s` | File 4 |
+| `Space xx` / `Space xX` | Diagnostics workspace / buffer |
+| `Space xs` / `Space xr` | Symbols / LSP references |
+| `Space xl` / `Space xq` | Location / quickfix list |
+| `Space xt` | Todo comments |
+| `Space o` | Symbol outline (aerial) |
 
-## Terminal
+## Git — `Space g`
 
-| Key | Action |
-|---|---|
-| `Space t` | `:Sterm` |
-| `Space tf` | Floating terminal |
-| `Space th` | Horizontal terminal |
-| `Space tv` | Vertical terminal |
-| `Space tt` | Snacks terminal |
-| `Space td` | Lazydocker |
-
-Terminal mode:
-- `Esc` to normal mode
-- `Ctrl-h/j/k/l` window navigation
-
-## Sessions / Notes / UI
+VS Code-style Source Control: real-time gutter (green add / blue modify /
+red delete), `M A D R U !` badges in the explorer, and a native panel.
 
 | Key | Action |
 |---|---|
-| `Space wr` / `Space ws` | Restore/save session |
-| `Space nt` / `Space nv` | Todo note float/vsplit |
-| `Space z` | Zen mode |
-| `Space un` | Dismiss notifications |
-| `Space uw/us/uL/uD/uZ/uS/uI/uW` | UI toggles |
-| `Space ;`, `[;`, `];` | Dropbar navigation |
-| `zR`, `zM`, `zr`, `zp` | UFO folds |
-| `Space m` | Maximize split |
+| `Space gg` | Git panel — Neogit (branch, ahead/behind, staged/untracked, conflicts) |
+| `Space gG` / `Space gF` | LazyGit / LazyGit current-file history |
+| `Space ge` | Git status in sidebar (stage/unstage/commit — see Explorer) |
+| `Space gd` / `Space gq` | Diff view (toggle) / toggle diff file panel |
+| `Space gh` / `Space gH` | File history / branch history |
+| `Space gl` / `Space gf` / `Space go` | Commit log / changed files / branches |
+| `]h` / `[h` | Next / prev hunk |
+| `Space gp` | Preview hunk (floating window) |
+| `Space gs` / `Space gr` | Stage / reset hunk (normal + visual) |
+| `Space gS` / `Space gR` | Stage / reset file |
+| `Space gu` / `Space gU` | Undo staged hunk / undo all staged in file |
+| `Space gb` / `Space gB` | Toggle inline blame / blame popup (author, hash, date) |
+| `Space gw` | Toggle word diff |
+| `Space gC` / `Space gP` | Commit / pull (Neogit) |
+| `ih` (visual/operator) | Select hunk |
 
-## Theme
+## Terminal — `Space t`
+
+WezTerm is the primary terminal (see below); the internal toggleterm remains
+for quick throwaway shells.
 
 | Key | Action |
 |---|---|
-| `Space cs` | Theme picker |
-| `Space ct` | Next theme |
-| `Space ca` | Auto day/night theme |
+| `Space tw` | WezTerm: new window (project root) |
+| `Space tp` / `Space td` | WezTerm: new tab in project root / file's dir |
+| `Space t\` / `Space t-` | WezTerm: split right / down (file's dir) |
+| `Ctrl-\` / `Space tt` | Toggle internal terminal |
+| `Space tf` `th` `tv` | Float / horizontal / vertical (internal) |
+| `Space t2` / `Space t3` | Extra internal terminals |
+| `Esc Esc` (term) | To normal mode |
+| `Ctrl-h/j/k/l` (term) | Move between windows |
+
+WezTerm launches reuse a running instance (new tab/pane, no second process)
+when Neovim is started from WezTerm; otherwise a fresh GUI window opens. The
+working directory is inherited automatically. The WezTerm colorscheme mirrors
+your Neovim theme live — change it with `:Theme` and the terminal follows.
+
+### WezTerm keys (config at `~/.config/wezterm`)
+
+Leader is `Ctrl-a` (tmux-style); `⌘` bindings mirror macOS/IDE habits.
+
+| Key | Action |
+|---|---|
+| `⌘ d` / `⌘ ⇧ d` | Split right / down |
+| `Leader \` / `Leader -` | Split right / down |
+| `Leader h/j/k/l` | Move between panes |
+| `Leader z` / `⌘ ⏎` | Zoom pane (toggle) |
+| `⌘ t` / `Leader t` | New tab |
+| `⌘ 1‑9` / `Leader 1‑9` | Jump to tab |
+| `⌘ ⇧ [ / ]` | Previous / next tab |
+| `Leader [` / `⌘ f` | Copy mode / search |
+| `⌘ ⇧ p` / `Leader P` | Command palette |
+| `⌘ ⇧ ⏎` | Toggle fullscreen |
+| `Leader Ctrl-a` | Send a literal Ctrl-a (Neovim increment) |
+
+## AI — `Space a`
+
+| Key | Action |
+|---|---|
+| `Space aa` / `Space ac` | AI actions / chat toggle (CodeCompanion) |
+| `Space ai` / `Space ad` | Inline prompt / add selection to chat |
+| `Space av` / `Space aA` / `Space ae` | Avante toggle / ask / edit selection |
+| `Space aC` / `Space as` / `Space af` | Claude Code toggle / send / focus |
+
+> Copilot suggestions appear inline as ghost text and in the completion menu.
+
+## Folds
+
+| Key | Action |
+|---|---|
+| `zR` / `zM` | Open / close all folds |
+| `zK` | Peek folded lines |
+| `za` `zo` `zc` | Toggle / open / close fold |
+
+## Tools & UI — `Space u`, `Space q`, `Space n`, `Space R`
+
+| Key | Action |
+|---|---|
+| `Space ut` / `:Theme` | Theme picker (live preview, remembered on restart) |
+| `Space uu` / `Space uz` | Undo tree / Zen mode |
+| `Space uD` / `Space uC` | Database UI / toggle cursor smear |
+| `Space un` / `Space nd` | Dismiss notifications |
+| `Space na` / `Space nl` | Notification history / last message |
+| `Space ql` `qs` `qd` | Session restore / save / delete |
+| `Space mp` | Markdown preview (browser) |
+| `Space Rs` `Ra` `Rt` `Rc` | REST send / send all / toggle view / copy curl |
+| `Space ;` | Breadcrumb picker (dropbar) |
+
+## Themes
+
+Umbra is the handcrafted default. Run `:Theme` (or `Space ut`) for a live
+preview picker of every installed colorscheme; your choice is remembered across
+restarts. Bundled alternates: Catppuccin, Tokyo Night, Kanagawa, Rosé Pine,
+Gruvbox, Everforest, OneDark (onedarkpro), Nightfox, Oxocarbon, Nord.
+
+Add or remove a theme by editing `lua/plugins/themes.lua` (the statusline
+adapts automatically). Variants like `catppuccin-mocha` or `tokyonight-moon`
+are selectable directly from the picker.
+
+## Completion (blink.cmp — insert mode)
+
+| Key | Action |
+|---|---|
+| `Tab` | Accept / jump snippet forward |
+| `Shift-Tab` | Prev item / jump snippet back |
+| `Enter` | Accept |
+| `Ctrl-Space` | Toggle documentation |
+| `Ctrl-n` / `Ctrl-p` | Next / previous item |
+| `Ctrl-f` / `Ctrl-b` | Scroll docs |
+| `Ctrl-e` | Cancel |
 
 ## Misc
 
 | Key | Action |
 |---|---|
-| `Space x` | `chmod +x` current file |
-| `Space vpp` | Open old packer config path |
-| `Space mr` | CellularAutomaton rain (requires plugin) |
 | `Ctrl-f` | tmux-sessionizer |
-| `Space Space` | Source current file |
-
----
-
-## Known Conflicts
-
-- `Space q`: Diffview toggle files and LSP loclist (buffer-local may win when attached)
-- `Space sr` / `Space sS`: Snacks search vs Substitute
-- `Space ca`: Theme auto (global) vs LSP code action (buffer-local)
-
-Use `Space sk` (Snacks keymap picker) to inspect live mappings.
-
+| `Space X` | `chmod +x` current file |
+| `Space ?` | Buffer-local keymaps (which-key) |

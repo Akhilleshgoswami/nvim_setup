@@ -42,9 +42,12 @@ NvChad v2.5 is the base framework for this config. It replaces the old custom `l
 | `Shift-C` | Close buffer |
 | `Space cs` | Theme picker |
 | `Space ct` | Next theme |
-| `Space ca` | Auto theme (day/night) |
+| `Space ca` | Code action (LSP) |
+| `Space cs` | Theme picker |
+| `Space ct` | Next theme |
+| `Space cD` | Auto theme (day/night) |
 
-**Note:** `Space ca` is global (theme). LSP code action also uses `Space ca` buffer-locally when attached.
+**Note:** `Space ca` is code action only. Day/night theme uses `Space cD`.
 
 ## Usage
 

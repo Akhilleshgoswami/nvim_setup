@@ -82,29 +82,55 @@ This file documents the active keymaps in your current NvChad-based setup.
 
 ## Git
 
-| Key | Action |
-|---|---|
-| `Space gd` | Diffview open |
-| `Space gc` | Diffview close |
-| `Space q` | Diffview toggle files panel |
-| `Space gg` | Lazygit |
-| `Space gb` | Blame line |
-| `Space go` | Git browse |
-| `Space gl` | Git log picker |
-| `Space gs` | Git status picker |
+A VS Code-style Source Control experience. The gutter shows changes in real
+time (green = added, blue = modified, red = deleted), the file explorer shows
+`M / A / D / R / U / !` badges, and `Space gg` opens a native panel.
 
-### Gitsigns (buffer local)
+### Panels & views
 
 | Key | Action |
 |---|---|
-| `]h` / `[h` | Next/prev hunk |
-| `Space hs` / `Space hS` | Stage hunk / stage buffer |
-| `Space hu` | Undo stage hunk |
-| `Space hr` / `Space hR` | Reset hunk / reset buffer |
-| `Space hp` / `Space hi` | Preview hunk / inline preview |
-| `Space hd` / `Space hD` | Diff this / diff against `~` |
-| `Space hb` / `Space hB` | Blame popup / toggle line blame |
-| `Space hx` / `Space hw` / `Space hl` | Toggle deleted / word diff / linehl |
+| `Space gg` | Git panel — Neogit source control (branch, ahead/behind, staged/untracked, conflicts) |
+| `Space gG` | LazyGit (full TUI) |
+| `Space gF` | LazyGit — current file history |
+| `Space ge` | Git status in the explorer sidebar (neo-tree) |
+| `Space gd` | Diff view — side-by-side, syntax highlighted (toggle) |
+| `Space gq` | Diff view — toggle the file panel |
+| `Space gh` | File history (current file) |
+| `Space gH` | Branch / project history |
+| `Space gl` | Commit log (Telescope) |
+| `Space gf` | Changed files (Telescope) |
+| `Space go` | Branches — checkout (Telescope) |
+
+### Hunks (gutter)
+
+| Key | Action |
+|---|---|
+| `]h` / `[h` | Next / previous hunk (also `]c` / `[c` inside a diff) |
+| `Space gp` | Preview hunk in a floating window |
+| `Space gs` | Stage hunk (works on a selection in visual mode) |
+| `Space gr` | Reset hunk (works on a selection in visual mode) |
+| `Space gS` | Stage entire file |
+| `Space gR` | Reset entire file |
+| `Space gu` | Undo stage (last hunk) |
+| `Space gU` | Undo all staged changes in the file |
+| `ih` | Hunk text object (e.g. `vih`, `dih`) |
+
+### Blame & commit
+
+| Key | Action |
+|---|---|
+| `Space gb` | Toggle inline blame for the current line (unobtrusive, end-of-line) |
+| `Space gB` | Blame line — full popup (author, message, hash, date) |
+| `Space gw` | Toggle word diff |
+| `Space gC` | Commit (Neogit) |
+| `Space gP` | Pull (Neogit) |
+
+Inside the **Neogit** panel: `s` stage · `u` unstage · `x` discard ·
+`c c` commit · `P` push · `p` pull · `Tab` toggle a diff · `q` close.
+
+Inside the **neo-tree Git** view (`Space ge`): `A` stage all · `ga` stage ·
+`gu` unstage · `gr` revert · `gc` commit · `gp` push · `gg` commit + push.
 
 ## LSP (buffer local)
 
@@ -123,15 +149,20 @@ This file documents the active keymaps in your current NvChad-based setup.
 | `Space zig` | Restart LSP |
 | `Space f` | Format via LSP |
 
+**Note:** `Space ca` is code action only. Day/night theme auto is `Space cD`.
+
 ## Completion (blink.cmp)
 
 | Key | Action |
 |---|---|
-| `Tab` / `Shift-Tab` | Next/prev completion or snippet jump |
-| `Ctrl-Space` | Show completion/docs |
-| `Ctrl-e` | Hide completion |
-| `Ctrl-j` / `Ctrl-k` | Scroll completion docs |
+| `Tab` | Accept selected completion (or jump snippet forward) |
+| `Shift-Tab` | Prev item / jump snippet backward |
+| `↑` / `↓` or `Ctrl-n` / `Ctrl-p` | Next / previous item |
 | `Enter` | Accept completion |
+| `Ctrl-Space` | Show completion / toggle docs |
+| `Ctrl-e` | Cancel completion |
+| `Ctrl-j` / `Ctrl-k` | Scroll completion docs |
+| `Space ca` | Code action (also "Add missing import") |
 
 ## Motion & Editing Plugins
 
@@ -146,14 +177,14 @@ This file documents the active keymaps in your current NvChad-based setup.
 - Rip substitute: `Space srf`
 
 ### Comment / Surround
-- Comment: `gcc`, `gc`, `gbc`, `gb`
+- Comment: `gcc`, `gc`, `gbc`, `gb` /
 - Surround: `ys`, `ds`, `cs`
 
 ## Harpoon
 
 | Key | Action |
 |---|---|
-| `Space a` | Add file |
+| `Space a` | Add fijke |
 | `Ctrl-m` | Toggle menu |
 | `Ctrl-h` | File 1 |
 | `Ctrl-n` | File 3 |
@@ -165,7 +196,7 @@ This file documents the active keymaps in your current NvChad-based setup.
 |---|---|
 | `Space t` | `:Sterm` |
 | `Space tf` | Floating terminal |
-| `Space th` | Horizontal terminal |
+| `Space th` | Horizontal terminal | 
 | `Space tv` | Vertical terminal |
 | `Space tt` | Snacks terminal |
 | `Space td` | Lazydocker |
@@ -181,10 +212,15 @@ Terminal mode:
 | `Space wr` / `Space ws` | Restore/save session |
 | `Space nt` / `Space nv` | Todo note float/vsplit |
 | `Space z` | Zen mode |
+| `Space fc` / `Space fe` | Fold / unfold at cursor |
+| `Space fa` | Toggle fold at cursor |
+| `Space fR` / `Space fM` | Open all / close all folds |
+| `Space fk` | Peek folded lines |
+| `zc` / `zo` / `za` | Fold / unfold / toggle (Vim keys) |
+| `zR` / `zM` / `zr` / `zp` | UFO fold shortcuts |
 | `Space un` | Dismiss notifications |
 | `Space uw/us/uL/uD/uZ/uS/uI/uW` | UI toggles |
 | `Space ;`, `[;`, `];` | Dropbar navigation |
-| `zR`, `zM`, `zr`, `zp` | UFO folds |
 | `Space m` | Maximize split |
 
 ## Theme
@@ -193,7 +229,7 @@ Terminal mode:
 |---|---|
 | `Space cs` | Theme picker |
 | `Space ct` | Next theme |
-| `Space ca` | Auto day/night theme |
+| `Space cD` | Auto day/night theme |
 
 ## Misc
 
@@ -211,6 +247,6 @@ Terminal mode:
 
 - `Space q`: Diffview toggle files and LSP loclist (buffer-local may win when attached)
 - `Space sr` / `Space sS`: Snacks search vs Substitute
-- `Space ca`: Theme auto (global) vs LSP code action (buffer-local)
+- `Space cD`: Auto day/night theme (`Space ca` is code action only)
 
 Use `Space sk` (Snacks keymap picker) to inspect live mappings.

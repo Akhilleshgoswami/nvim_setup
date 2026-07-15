@@ -66,4 +66,4 @@ Open a supported file — Mason-installed servers attach automatically. Use `gd`
 - **No LSP:** `:Mason` → install `lua_ls`, `gopls`, `ts_ls`, or `eslint`. Restart buffer.
 - **eslint not running:** Ensure `eslint` is in project or global install; check `:LspInfo`.
 - **Format does nothing:** LSP format may be unavailable — use conform (`Space f` via conform if NvChad wires it).
-- **`Space ca` opens theme:** Global theme bind conflicts; LSP buffer-local mapping wins when attached.
+- **`Space ca` does nothing:** Ensure LSP is attached (`:LspInfo`). For missing imports, wait for the diagnostic first.
