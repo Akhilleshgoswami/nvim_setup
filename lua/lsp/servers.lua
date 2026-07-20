@@ -18,7 +18,7 @@ return {
         workspace = { checkThirdParty = false },
         codeLens = { enable = true },
         completion = { callSnippet = "Replace" },
-        diagnostics = { globals = { "vim", "Snacks" } },
+        diagnostics = { globals = { "vim" } },
         hint = { enable = true, setType = true },
         format = { enable = false },
       },

@@ -76,14 +76,20 @@ end
 -- ── Config reload ────────────────────────────────────────────────
 function M.reload()
   for name, _ in pairs(package.loaded) do
-    if name:match("^core") or name:match("^themes") or name:match("^utils") then
+    if name:match("^core")
+      or name:match("^themes")
+      or name:match("^utils")
+      or name:match("^umbra")
+      or name:match("^features")
+      or name:match("^lsp") then
       package.loaded[name] = nil
     end
   end
   require("core.options")
   require("core.autocmds")
   require("core.keymaps")
-  vim.cmd.colorscheme("umbra")
+  require("features.theme").load_saved()
+  require("features.intelligence").setup()
   vim.notify("Umbra config reloaded", vim.log.levels.INFO, { title = "Umbra" })
 end
 

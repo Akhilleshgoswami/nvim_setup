@@ -90,17 +90,8 @@ local function config_dir()
   return base .. "/wezterm"
 end
 
-local function hl(name)
-  local ok, h = pcall(vim.api.nvim_get_hl, 0, { name = name, link = false })
-  return ok and h or {}
-end
-
-local function hex(n, fallback)
-  if type(n) == "number" then
-    return string.format("#%06x", n)
-  end
-  return fallback
-end
+-- Read a highlight attribute as hex — the shared implementation.
+local get = require("umbra.hl").get
 
 -- Prefer Neovim's terminal palette; fall back to a sensible ANSI slot.
 local function term_color(i, fallback)
@@ -110,18 +101,8 @@ end
 
 -- Snapshot the active theme into the shape wezterm/colors/nvim-sync.lua expects.
 local function snapshot()
-  local normal = hl("Normal")
-  local fg = hex(normal.fg, "#c6cad4")
-  local bg = hex(normal.bg, "#101216")
-
-  local cursor = hl("Cursor")
-  local visual = hl("Visual")
-  local comment = hl("Comment")
-  local accent = hl("Function")
-  local statusline = hl("StatusLine")
-  local cursorline = hl("CursorLine")
-  local pmenusel = hl("PmenuSel")
-  local sep = hl("WinSeparator")
+  local fg = get("Normal", "fg") or "#c6cad4"
+  local bg = get("Normal", "bg") or "#101216"
 
   local ansi_fallback = { "#191c23", "#eb6f82", "#9bd09e", "#e6c58c", "#7fa7f0", "#b39df3", "#5fd1be", "#c6cad4" }
   local bright_fallback = { "#565d6d", "#ef8496", "#aad9ac", "#edcf9e", "#96b8f4", "#c3b0f6", "#7cd9c9", "#e4e7ee" }
@@ -134,29 +115,29 @@ local function snapshot()
     brights[i - 7] = term_color(i, bright_fallback[i - 7])
   end
 
-  local tab_active_bg = hex(cursorline.bg, hex(statusline.bg, bg))
-  local accent_fg = hex(accent.fg, "#7fa7f0")
+  local tab_active_bg = get("CursorLine", "bg") or get("StatusLine", "bg") or bg
+  local accent_fg = get("Function", "fg") or "#7fa7f0"
 
   return {
     theme = vim.g.colors_name or "umbra",
     colors = {
       foreground = fg,
       background = bg,
-      cursor_bg = hex(cursor.bg, accent_fg),
-      cursor_fg = hex(cursor.fg, bg),
-      cursor_border = hex(cursor.bg, accent_fg),
-      selection_bg = hex(visual.bg, "#293040"),
-      selection_fg = hex(visual.fg, fg),
-      split = hex(sep.fg, tab_active_bg),
+      cursor_bg = get("Cursor", "bg") or accent_fg,
+      cursor_fg = get("Cursor", "fg") or bg,
+      cursor_border = get("Cursor", "bg") or accent_fg,
+      selection_bg = get("Visual", "bg") or "#293040",
+      selection_fg = get("Visual", "fg") or fg,
+      split = get("WinSeparator", "fg") or tab_active_bg,
       ansi = ansi,
       brights = brights,
     },
     ui = {
-      tab_bg = hex(statusline.bg, bg),
+      tab_bg = get("StatusLine", "bg") or bg,
       tab_active_bg = tab_active_bg,
       tab_active_fg = fg,
-      tab_inactive_fg = hex(comment.fg, "#6b7280"),
-      tab_hover_bg = hex(pmenusel.bg, tab_active_bg),
+      tab_inactive_fg = get("Comment", "fg") or "#6b7280",
+      tab_hover_bg = get("PmenuSel", "bg") or tab_active_bg,
       accent = accent_fg,
       status_fg = accent_fg,
     },

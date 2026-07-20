@@ -2,6 +2,7 @@
 
 local o = vim.opt
 local g = vim.g
+local icons = require("umbra.icons")
 
 g.autoformat = true
 g.markdown_recommended_style = 0
@@ -27,8 +28,8 @@ o.linebreak = true
 o.breakindent = true
 o.list = true
 o.fillchars = {
-  foldopen = "▾",
-  foldclose = "▸",
+  foldopen = icons.ui.fold_open,
+  foldclose = icons.ui.fold_closed,
   fold = " ",
   foldsep = " ",
   diff = "╱",

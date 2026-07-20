@@ -5,7 +5,7 @@ return {
   {
     "kylechui/nvim-surround",
     version = "*",
-    keys = { "ys", "yss", "ds", "cs", { "S", mode = "x" } },
+    keys = { "ys", "yss", "ds", "cs" },
     opts = {},
   },
 
@@ -88,6 +88,16 @@ return {
     opts = {
       signs = true,
       highlight = { multiline = false, keyword = "wide_bg", pattern = [[.*<(KEYWORDS)\s*:]] },
+      search = { pattern = [[\b(KEYWORDS):]] },
+      keywords = {
+        FIX = { icon = " ", color = "error", alt = { "FIXME", "BUG", "ISSUE" } },
+        TODO = { icon = " ", color = "info" },
+        HACK = { icon = " ", color = "warning" },
+        WARN = { icon = " ", color = "warning", alt = { "WARNING" } },
+        NOTE = { icon = " ", color = "hint", alt = { "INFO" } },
+        PERF = { icon = " ", alt = { "OPTIMIZE", "PERFORMANCE" } },
+        SECURITY = { icon = " ", color = "error", alt = { "SEC", "VULN" } },
+      },
     },
   },
 }

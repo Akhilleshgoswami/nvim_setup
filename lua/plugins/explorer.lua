@@ -1,7 +1,8 @@
 -- File exploration: neo-tree as the sidebar/float tree, oil for editing
 -- the filesystem like a buffer.
 
-local icons = require("utils.icons")
+local icons = require("umbra.icons")
+local ui = require("umbra.tokens")
 
 return {
   {
@@ -23,7 +24,7 @@ return {
     },
     opts = {
       close_if_last_window = true,
-      popup_border_style = "rounded",
+      popup_border_style = ui.border,
       enable_git_status = true,
       enable_diagnostics = true,
       sources = { "filesystem", "buffers", "git_status" },
@@ -31,16 +32,16 @@ return {
         winbar = true,
         content_layout = "center",
         sources = {
-          { source = "filesystem", display_name = "  Files " },
-          { source = "buffers", display_name = "  Buffers " },
-          { source = "git_status", display_name = "  Git " },
+          { source = "filesystem", display_name = " \u{f024b} Files " },
+          { source = "buffers", display_name = " \u{f0219} Buffers " },
+          { source = "git_status", display_name = " \u{f062c} Git " },
         },
       },
       default_component_configs = {
         indent = {
           with_markers = true,
-          indent_marker = "│",
-          last_indent_marker = "╰",
+          indent_marker = icons.tree.indent,
+          last_indent_marker = icons.tree.last,
           with_expanders = true,
           expander_collapsed = icons.ui.fold_closed,
           expander_expanded = icons.ui.fold_open,
@@ -70,7 +71,7 @@ return {
         },
       },
       window = {
-        width = 32,
+        width = ui.panel.md,
         mappings = {
           ["<space>"] = "none",
           ["l"] = "open",
@@ -159,7 +160,8 @@ return {
   {
     "stevearc/oil.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
-    lazy = false,
+    lazy = true,
+    cmd = "Oil",
     keys = {
       { "-", function() require("oil").open_float() end, desc = "Open parent (oil)" },
       { "<leader>-", "<cmd>Oil<cr>", desc = "Open parent (oil split)" },
@@ -175,11 +177,11 @@ return {
         end,
       },
       float = {
-        padding = 3,
-        border = "rounded",
+        padding = ui.space.md,
+        border = ui.border,
         max_width = 90,
         max_height = 30,
-        win_options = { winblend = 0 },
+        win_options = { winblend = ui.opacity.float },
       },
       keymaps = {
         ["<C-h>"] = false,

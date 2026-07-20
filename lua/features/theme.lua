@@ -131,6 +131,43 @@ function M.pick()
   end
 end
 
+-- Recolor the gitsigns gutter to VS Code semantics (green add, blue change, red
+-- delete), adapting to whatever theme is active. Reads the active theme's own
+-- diff/diagnostic colors, falling back to Umbra's semantic tokens.
+local function recolor_gitsigns()
+  local hl = require("umbra.hl")
+  local color = require("umbra.color")
+  local add = hl.first_fg({ "Added", "diffAdded", "@diff.plus", "DiagnosticOk", "String" }, color.git.add)
+  local change = hl.first_fg({ "DiagnosticInfo", "@diff.delta", "Function" }, color.secondary)
+  local delete = hl.first_fg({ "Removed", "diffRemoved", "@diff.minus", "DiagnosticError" }, color.git.delete)
+  local set = vim.api.nvim_set_hl
+  set(0, "GitSignsAdd", { fg = add })
+  set(0, "GitSignsChange", { fg = change })
+  set(0, "GitSignsDelete", { fg = delete })
+  set(0, "GitSignsChangedelete", { fg = change })
+  set(0, "GitSignsTopdelete", { fg = delete })
+  set(0, "GitSignsUntracked", { fg = add })
+  set(0, "GitSignsAddNr", { fg = add })
+  set(0, "GitSignsChangeNr", { fg = change })
+  set(0, "GitSignsDeleteNr", { fg = delete })
+end
+
+-- Recolor DAP signs from semantic tokens, adapting to the active theme.
+local function recolor_dap()
+  local hl = require("umbra.hl")
+  local color = require("umbra.color")
+  local set = vim.api.nvim_set_hl
+  set(0, "DapBreakpoint", { fg = hl.first_fg({ "DiagnosticError" }, color.error) })
+  set(0, "DapBreakpointCondition", { fg = hl.first_fg({ "DiagnosticWarn" }, color.warning) })
+  set(0, "DapLogPoint", { fg = hl.first_fg({ "DiagnosticInfo" }, color.info) })
+  set(0, "DapBreakpointRejected", { fg = hl.first_fg({ "NonText", "Comment" }, color.muted) })
+  set(0, "DapStopped", { fg = hl.first_fg({ "DiagnosticOk", "String" }, color.success) })
+  set(0, "DapStoppedLine", { bg = color.stopped_line })
+end
+
+M.recolor_gitsigns = recolor_gitsigns
+M.recolor_dap = recolor_dap
+
 -- Keep a handful of bespoke highlight groups looking right under *any* theme.
 -- Umbra defines these explicitly; for other themes we link them to sensible
 -- built-ins (default = true means we never clobber a theme that defines them).
@@ -158,7 +195,10 @@ function M.setup()
     callback = function(ev)
       M.save(ev.match or vim.g.colors_name)
       M.fix_custom_highlights()
-      -- Mirror the active theme into WezTerm (no-op if WezTerm isn't set up).
+      -- One reactor owns every theme-derived recolor: gutter, debugger, and the
+      -- WezTerm mirror. (No plugin registers its own ColorScheme handler.)
+      recolor_gitsigns()
+      recolor_dap()
       pcall(function()
         require("features.wezterm").sync_theme_debounced()
       end)
@@ -166,7 +206,6 @@ function M.setup()
   })
 
   vim.api.nvim_create_user_command("Theme", M.pick, { desc = "Pick a colorscheme (with preview)" })
-  vim.api.nvim_create_user_command("Colorscheme", M.pick, { desc = "Pick a colorscheme (with preview)" })
 
   vim.keymap.set("n", "<leader>ut", M.pick, { desc = "Theme picker" })
 end

@@ -1,5 +1,7 @@
 -- Integrated terminals: float / horizontal / vertical, multiple & persistent.
 
+local ui = require("umbra.tokens")
+
 return {
   "akinsho/toggleterm.nvim",
   version = "*",
@@ -12,6 +14,11 @@ return {
     { "<leader>tv", "<cmd>ToggleTerm direction=vertical<cr>", desc = "Vertical terminal" },
     { "<leader>t2", "<cmd>2ToggleTerm<cr>", desc = "Terminal 2" },
     { "<leader>t3", "<cmd>3ToggleTerm<cr>", desc = "Terminal 3" },
+    -- Task runner (auto-detects package manager / language, runs from root).
+    { "<leader>tr", function() require("features.runner").run_project() end, desc = "Run project" },
+    { "<leader>tR", function() require("features.runner").run_tests() end, desc = "Run tests" },
+    { "<leader>tn", function() require("features.runner").npm_scripts() end, desc = "npm scripts" },
+    { "<leader>tD", function() require("features.runner").docker() end, desc = "Docker menu" },
   },
   opts = {
     open_mapping = false,
@@ -29,11 +36,11 @@ return {
     close_on_exit = true,
     direction = "float",
     float_opts = {
-      border = "rounded",
-      width = function() return math.floor(vim.o.columns * 0.85) end,
-      height = function() return math.floor(vim.o.lines * 0.8) end,
-      winblend = 0,
-      title_pos = "center",
+      border = ui.border,
+      width = function() return math.floor(vim.o.columns * ui.float.lg.width) end,
+      height = function() return math.floor(vim.o.lines * ui.float.lg.height) end,
+      winblend = ui.opacity.float,
+      title_pos = ui.title.pos,
     },
     highlights = {
       Normal = { link = "Normal" },

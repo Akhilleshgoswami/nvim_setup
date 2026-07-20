@@ -1,8 +1,15 @@
--- The visible identity: statusline, bufferline, breadcrumbs, cmdline,
+-- The visible identity: statusline, winbar, breadcrumbs, cmdline,
 -- notifications, indent guides, and the keymap guide.
 
-local icons = require("utils.icons")
-local palette = require("themes.umbra.palette")
+local icons = require("umbra.icons")
+local active_theme = require("themes.active")
+local hl = require("umbra.hl")
+local ui = require("umbra.tokens")
+local motion = require("umbra.motion")
+
+local function theme_fg(groups, fallback)
+  return hl.first_fg(groups, fallback)
+end
 
 return {
   -- Icon provider (shared).
@@ -18,25 +25,44 @@ return {
     event = "VeryLazy",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = function()
-      local function lsp_clients()
-        local names = {}
-        for _, client in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
-          if client.name ~= "null-ls" and client.name ~= "copilot" then
-            names[#names + 1] = client.name
-          end
-        end
-        if #names == 0 then
-          return ""
-        end
-        return "  " .. table.concat(names, " ")
-      end
-
+      -- Transient, important: which macro register is recording.
       local function macro()
         local reg = vim.fn.reg_recording()
-        return reg ~= "" and ("  rec @" .. reg) or ""
+        return reg ~= "" and (icons.ui.dot .. " rec @" .. reg) or ""
       end
 
-      local minimal_ft = { "neo-tree", "alpha", "toggleterm", "trouble", "aerial", "lazy", "mason" }
+      -- One dot: lit (accent) when a real language server is attached. The old
+      -- statusline spelled out every client name — noise. The dot answers the
+      -- only question that matters at a glance: "is intelligence live here?"
+      local function lsp_dot()
+        for _, client in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
+          if client.name ~= "null-ls" and client.name ~= "copilot" then
+            return icons.ui.dot
+          end
+        end
+        return ""
+      end
+
+      -- Harpoon working set — the deliberate replacement for a bufferline.
+      -- Shows only the files you chose to pin (1..6), active one emphasized.
+      -- Guarded on package.loaded so it never force-loads Harpoon at startup.
+      local function harpoon_marks()
+        if not package.loaded["harpoon"] then return "" end
+        local list = require("harpoon"):list()
+        local items = list.items or {}
+        if #items == 0 then return "" end
+        local cur = vim.api.nvim_buf_get_name(0)
+        local parts = {}
+        for i, item in ipairs(items) do
+          if i > 6 then break end
+          local val = item.value or ""
+          local name = val ~= "" and vim.fn.fnamemodify(val, ":t") or ("[" .. i .. "]")
+          local active = val ~= "" and cur ~= "" and cur:sub(-#val) == val
+          local grp = active and "UmbraHarpoonActive" or "UmbraHarpoonInactive"
+          parts[#parts + 1] = ("%%#%s#%d %s%%*"):format(grp, i, name)
+        end
+        return icons.ui.bookmark .. " " .. table.concat(parts, "  ")
+      end
 
       return {
         options = {
@@ -50,9 +76,12 @@ return {
           disabled_filetypes = { statusline = { "alpha" } },
           refresh = { statusline = 200 },
         },
+        -- Left: where you are in the world (mode, branch, diff, working set).
+        -- Center: calm, empty.
+        -- Right: the current buffer's state (problems, LSP, position).
         sections = {
           lualine_a = {
-            { "mode", fmt = function(m) return " " .. m:sub(1, 3) end, padding = { left = 1, right = 1 } },
+            { "mode", fmt = function(m) return " " .. m:sub(1, 3) .. " " end, padding = { left = 0, right = 0 } },
           },
           lualine_b = {
             { "branch", icon = icons.git.branch, padding = { left = 1, right = 1 } },
@@ -61,8 +90,12 @@ return {
             {
               "diff",
               symbols = { added = icons.git.added .. " ", modified = icons.git.modified .. " ", removed = icons.git.removed .. " " },
-              padding = { left = 1, right = 0 },
+              padding = { left = 1, right = 1 },
             },
+            { harpoon_marks, padding = { left = 1, right = 0 } },
+            { macro, color = { fg = theme_fg({ "DiagnosticWarn", "WarningMsg" }, active_theme.palette().accent.rose) }, padding = { left = 1, right = 0 } },
+          },
+          lualine_x = {
             {
               "diagnostics",
               symbols = {
@@ -73,127 +106,20 @@ return {
               },
               padding = { left = 1, right = 1 },
             },
-            {
-              "filename",
-              path = 1,
-              symbols = { modified = " " .. icons.ui.modified, readonly = " " .. icons.ui.lock, unnamed = "[No Name]" },
-              color = { fg = palette.fg.muted },
-            },
-          },
-          lualine_x = {
-            { macro, color = { fg = palette.accent.rose } },
-            { lsp_clients, color = { fg = palette.fg.muted } },
-            {
-              function()
-                local ok, conform = pcall(require, "conform")
-                if not ok then return "" end
-                local fmts = conform.list_formatters(0)
-                return #fmts > 0 and ("󰉼 " .. fmts[1].name) or ""
-              end,
-              color = { fg = palette.fg.muted },
-            },
+            { lsp_dot, color = { fg = theme_fg({ "Function", "DiagnosticOk" }, active_theme.palette().accent.indigo) }, padding = { left = 0, right = 1 } },
           },
           lualine_y = {
-            {
-              function()
-                local fmt = vim.bo.fileformat
-                local enc = vim.bo.fileencoding
-                local parts = {}
-                if enc ~= "" and enc ~= "utf-8" then parts[#parts + 1] = enc end
-                if fmt ~= "unix" then parts[#parts + 1] = fmt end
-                return table.concat(parts, " ")
-              end,
-              color = { fg = palette.accent.sand },
-            },
-            { "filetype", icon_only = true, padding = { left = 1, right = 0 } },
+            { "location", padding = { left = 1, right = 1 } },
           },
           lualine_z = {
-            { "location", padding = { left = 1, right = 1 } },
-            { "progress", padding = { left = 0, right = 1 } },
+            { "progress", padding = { left = 1, right = 1 } },
           },
         },
         inactive_sections = {
-          lualine_c = { { "filename", path = 1, color = { fg = palette.fg.faint } } },
-          lualine_x = { "location" },
+          lualine_c = {},
+          lualine_x = { { "location", padding = { left = 1, right = 1 } } },
         },
         extensions = { "neo-tree", "lazy", "toggleterm", "trouble", "quickfix", "man" },
-      }
-    end,
-  },
-
-  -- ── Bufferline (minimal, thin, no giant icons) ─────────────────
-  {
-    "akinsho/bufferline.nvim",
-    event = "VeryLazy",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    keys = {
-      { "<Tab>", "<cmd>BufferLineCycleNext<cr>", desc = "Next buffer" },
-      { "<S-Tab>", "<cmd>BufferLineCyclePrev<cr>", desc = "Prev buffer" },
-      { "<leader>bp", "<cmd>BufferLineTogglePin<cr>", desc = "Pin buffer" },
-      { "<leader>bh", "<cmd>BufferLineCloseLeft<cr>", desc = "Close buffers left" },
-      { "<leader>bl", "<cmd>BufferLineCloseRight<cr>", desc = "Close buffers right" },
-      { "<leader>b1", "<cmd>BufferLineGoToBuffer 1<cr>", desc = "Buffer 1" },
-      { "<leader>b2", "<cmd>BufferLineGoToBuffer 2<cr>", desc = "Buffer 2" },
-      { "<leader>b3", "<cmd>BufferLineGoToBuffer 3<cr>", desc = "Buffer 3" },
-    },
-    opts = function()
-      local p = palette
-      return {
-        options = {
-          mode = "buffers",
-          themable = true,
-          numbers = "none",
-          indicator = { style = "underline" },
-          buffer_close_icon = icons.ui.close,
-          modified_icon = icons.ui.modified,
-          close_icon = icons.ui.close,
-          left_trunc_marker = "",
-          right_trunc_marker = "",
-          max_name_length = 22,
-          tab_size = 16,
-          padding = 1,
-          show_buffer_close_icons = false,
-          show_close_icon = false,
-          show_tab_indicators = true,
-          separator_style = { "▏", "▏" },
-          always_show_bufferline = false,
-          diagnostics = "nvim_lsp",
-          diagnostics_indicator = function(_, _, diag)
-            local s = {}
-            if diag.error then s[#s + 1] = icons.diagnostics.Error .. diag.error end
-            if diag.warning then s[#s + 1] = icons.diagnostics.Warn .. diag.warning end
-            return #s > 0 and (" " .. table.concat(s, " ")) or ""
-          end,
-          offsets = {
-            {
-              filetype = "neo-tree",
-              text = "EXPLORER",
-              text_align = "center",
-              highlight = "NeoTreeTitleBar",
-              separator = false,
-            },
-          },
-          hover = { enabled = true, delay = 100, reveal = { "close" } },
-        },
-        highlights = {
-          fill = { bg = p.bg.base },
-          background = { fg = p.fg.muted, bg = p.bg.dark },
-          buffer_selected = { fg = p.fg.base, bg = p.bg.base, bold = true, italic = false },
-          buffer_visible = { fg = p.fg.dim, bg = p.bg.dark },
-          separator = { fg = p.bg.base, bg = p.bg.dark },
-          separator_selected = { fg = p.bg.base, bg = p.bg.base },
-          separator_visible = { fg = p.bg.base, bg = p.bg.dark },
-          indicator_selected = { fg = p.accent.indigo, bg = p.bg.base },
-          modified = { fg = p.accent.sand, bg = p.bg.dark },
-          modified_selected = { fg = p.accent.sand, bg = p.bg.base },
-          modified_visible = { fg = p.accent.sand, bg = p.bg.dark },
-          duplicate = { fg = p.fg.muted, bg = p.bg.dark, italic = true },
-          duplicate_selected = { fg = p.fg.dim, bg = p.bg.base, italic = true },
-          error_selected = { fg = p.diag.error, bg = p.bg.base },
-          warning_selected = { fg = p.diag.warn, bg = p.bg.base },
-          error = { fg = p.diag.error, bg = p.bg.dark },
-          warning = { fg = p.diag.warn, bg = p.bg.dark },
-        },
       }
     end,
   },
@@ -253,14 +179,14 @@ return {
       {
         "rcarriga/nvim-notify",
         opts = {
-          stages = "fade_in_slide_out",
+          stages = motion.enabled and "fade_in_slide_out" or "static",
           timeout = 2500,
           max_width = 62,
           max_height = 12,
-          fps = 60,
+          fps = motion.fps,
           render = "wrapped-compact",
           top_down = false,
-          background_colour = palette.bg.float,
+          background_colour = hl.get("NormalFloat", "bg") or active_theme.palette().bg.float,
           icons = {
             ERROR = icons.diagnostics.Error,
             WARN = icons.diagnostics.Warn,
@@ -275,11 +201,11 @@ return {
       cmdline = {
         view = "cmdline_popup",
         format = {
-          cmdline = { pattern = "^:", icon = " ", lang = "vim" },
-          search_down = { kind = "search", pattern = "^/", icon = "  ", lang = "regex" },
-          search_up = { kind = "search", pattern = "^%?", icon = "  ", lang = "regex" },
-          lua = { pattern = "^:%s*lua%s+", icon = "  ", lang = "lua" },
-          help = { pattern = "^:%s*he?l?p?%s+", icon = " " },
+          cmdline = { pattern = "^:", icon = icons.ui.prompt, lang = "vim" },
+          search_down = { kind = "search", pattern = "^/", icon = "\u{f0349}", lang = "regex" },
+          search_up = { kind = "search", pattern = "^%?", icon = "\u{f0349}", lang = "regex" },
+          lua = { pattern = "^:%s*lua%s+", icon = "\u{e620}", lang = "lua" },
+          help = { pattern = "^:%s*he?l?p?%s+", icon = "?" },
         },
       },
       messages = { enabled = true, view = "mini" },
@@ -294,7 +220,7 @@ return {
         },
         documentation = {
           view = "hover",
-          opts = { border = { style = "rounded" }, win_options = { winblend = 0 } },
+          opts = { border = { style = ui.border }, win_options = { winblend = ui.opacity.float } },
         },
       },
       presets = {
@@ -305,11 +231,11 @@ return {
       },
       views = {
         cmdline_popup = {
-          border = { style = "rounded", padding = { 0, 1 } },
+          border = { style = ui.border, padding = { ui.space.none, ui.space.xs } },
           position = { row = "40%", col = "50%" },
           size = { width = 62, height = "auto" },
         },
-        mini = { win_options = { winblend = 0 } },
+        mini = { win_options = { winblend = ui.opacity.float } },
       },
       routes = {
         { filter = { event = "msg_show", any = { { find = "%d+L, %d+B" }, { find = "; after #%d+" }, { find = "; before #%d+" }, { find = "written" } } }, view = "mini" },
@@ -330,13 +256,15 @@ return {
     main = "ibl",
     event = { "BufReadPost", "BufNewFile" },
     opts = {
-      indent = { char = "│", tab_char = "│" },
+      indent = { char = icons.ui.separator, tab_char = icons.ui.separator },
       scope = { enabled = true, show_start = false, show_end = false },
       exclude = {
         filetypes = {
           "help", "alpha", "dashboard", "neo-tree", "Trouble", "trouble",
           "lazy", "mason", "notify", "toggleterm", "lazyterm", "aerial",
           "man", "gitcommit", "TelescopePrompt", "TelescopeResults",
+          "dapui_scopes", "dapui_watches", "dapui_stacks", "dapui_breakpoints",
+          "dapui_console", "dap-repl",
         },
       },
     },
@@ -366,16 +294,18 @@ return {
       preset = "modern",
       delay = 300,
       icons = { mappings = false, separator = icons.ui.chevron_right },
-      win = { border = "rounded", padding = { 1, 2 } },
+      win = { border = ui.border, padding = { ui.space.xs, ui.space.sm } },
       spec = {
-        { "<leader>a", group = "ai" },
         { "<leader>b", group = "buffer" },
         { "<leader>c", group = "code" },
+        { "<leader>d", group = "debug" },
         { "<leader>f", group = "find" },
         { "<leader>g", group = "git" },
         { "<leader>h", group = "harpoon" },
+        { "<leader>m", group = "markdown" },
         { "<leader>n", group = "notify" },
         { "<leader>o", group = "outline" },
+        { "<leader>p", group = "project" },
         { "<leader>q", group = "session" },
         { "<leader>r", group = "rename/refactor" },
         { "<leader>R", group = "rest/http" },

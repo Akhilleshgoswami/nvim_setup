@@ -1,29 +1,10 @@
--- Shared UI design tokens. Every float uses the same border + title style,
--- which is what makes the config feel like one coherent product.
+-- Compat shim. UI geometry now lives in umbra.tokens / umbra.window.
+local t = require("umbra.tokens")
+local window = require("umbra.window")
 
 local M = {}
-
-M.border = "rounded"
-
--- A padded rounded border with breathing room on the sides.
-M.border_padded = {
-  { "╭", "FloatBorder" },
-  { "─", "FloatBorder" },
-  { "╮", "FloatBorder" },
-  { "│", "FloatBorder" },
-  { "╯", "FloatBorder" },
-  { "─", "FloatBorder" },
-  { "╰", "FloatBorder" },
-  { "│", "FloatBorder" },
-}
-
--- Standard floating-window options for handmade popups.
-function M.float_opts(opts)
-  return vim.tbl_deep_extend("force", {
-    border = M.border,
-    relative = "editor",
-    style = "minimal",
-  }, opts or {})
-end
+M.border = t.border
+M.border_chars = t.border_chars
+M.float_opts = window.float
 
 return M

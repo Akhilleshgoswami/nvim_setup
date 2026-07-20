@@ -1,7 +1,6 @@
 -- Optional colorschemes. Umbra is the handcrafted default (see themes/umbra);
--- these are curated, high-quality alternatives you can switch to at runtime
--- with `:Theme`. They stay lazy — only the saved theme loads at startup, so
--- carrying ten themes costs nothing until you actually reach for one.
+-- switch to any of these with `:Theme`. They stay lazy — only the saved theme
+-- loads at startup.
 --
 -- Adding a theme: drop a spec here and, if its `:colorscheme` name isn't an
 -- obvious prefix, teach `features/theme.lua` how to map name → plugin.

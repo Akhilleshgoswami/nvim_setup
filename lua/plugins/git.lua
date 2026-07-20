@@ -5,7 +5,8 @@
 --   lazygit   → full TUI when you want it
 --   telescope → branch / commit / status pickers
 
-local icons = require("utils.icons")
+local icons = require("umbra.icons")
+local ui = require("umbra.tokens")
 
 return {
   {
@@ -58,45 +59,10 @@ return {
       current_line_blame = false,
       current_line_blame_opts = { delay = 350, virt_text_pos = "eol", ignore_whitespace = true },
       current_line_blame_formatter = "  <author>, <author_time:%R> · <summary>",
-      preview_config = { border = "rounded" },
+      preview_config = { border = require("umbra.tokens").border },
     },
-    config = function(_, opts)
-      require("gitsigns").setup(opts)
-
-      -- VS Code semantics for the gutter: green added, blue modified, red
-      -- deleted — adapting to whatever theme is active (blue is pulled from the
-      -- theme's own info/function color so it always fits).
-      local function vscode_gutter()
-        local function fg(groups, fallback)
-          for _, g in ipairs(groups) do
-            local ok, h = pcall(vim.api.nvim_get_hl, 0, { name = g, link = false })
-            if ok and h and h.fg then
-              return string.format("#%06x", h.fg)
-            end
-          end
-          return fallback
-        end
-        local add = fg({ "Added", "diffAdded", "@diff.plus", "DiagnosticOk", "String" }, "#9BD09E")
-        local change = fg({ "DiagnosticInfo", "@diff.delta", "Function" }, "#7FA7F0")
-        local delete = fg({ "Removed", "diffRemoved", "@diff.minus", "DiagnosticError" }, "#EB6F82")
-        local set = vim.api.nvim_set_hl
-        set(0, "GitSignsAdd", { fg = add })
-        set(0, "GitSignsChange", { fg = change })
-        set(0, "GitSignsDelete", { fg = delete })
-        set(0, "GitSignsChangedelete", { fg = change })
-        set(0, "GitSignsTopdelete", { fg = delete })
-        set(0, "GitSignsUntracked", { fg = add })
-        set(0, "GitSignsAddNr", { fg = add })
-        set(0, "GitSignsChangeNr", { fg = change })
-        set(0, "GitSignsDeleteNr", { fg = delete })
-      end
-
-      vscode_gutter()
-      vim.api.nvim_create_autocmd("ColorScheme", {
-        group = vim.api.nvim_create_augroup("umbra_gitsigns_hl", { clear = true }),
-        callback = vscode_gutter,
-      })
-    end,
+    -- Gutter colors (VS Code semantics, adapting to the active theme) are owned
+    -- by the single ColorScheme reactor in features/theme.lua.
   },
 
   -- ── Source Control panel (VS Code-like) ────────────────────────
@@ -151,7 +117,7 @@ return {
         default = { winbar_info = true },
         merge_tool = { layout = "diff3_mixed" },
       },
-      file_panel = { win_config = { width = 32 } },
+      file_panel = { win_config = { width = ui.panel.lg } },
     },
   },
 
@@ -166,7 +132,7 @@ return {
     },
     init = function()
       vim.g.lazygit_floating_window_scaling_factor = 0.9
-      vim.g.lazygit_floating_window_border_chars = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" }
+      vim.g.lazygit_floating_window_border_chars = require("umbra.tokens").border_chars
     end,
   },
 

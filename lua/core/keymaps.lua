@@ -10,9 +10,9 @@ map("n", "<leader>nh", "<cmd>nohlsearch<cr>", { desc = "Clear highlights" })
 map({ "n", "i", "x", "s" }, "<C-s>", "<cmd>write<cr><esc>", { desc = "Save file" })
 map("n", "<leader>w", "<cmd>write<cr>", { desc = "Save file" })
 map("n", "<leader>W", "<cmd>wall<cr>", { desc = "Save all" })
-map("n", "<leader>c", "<cmd>close<cr>", { desc = "Close window" })
 map("n", "<leader>Q", "<cmd>qa<cr>", { desc = "Quit all" })
 map("n", "Q", "<nop>")
+-- (Window close lives at <leader>sx; <leader>c is the code group.)
 
 -- ── Movement & editing niceties ─────────────────────────────────
 map({ "n", "x" }, "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
@@ -30,7 +30,8 @@ map("x", "K", ":m '<-2<cr>gv=gv", { desc = "Move selection up", silent = true })
 -- Register-friendly clipboard.
 map({ "n", "v" }, "<leader>y", [["+y]], { desc = "Yank to system clipboard" })
 map("n", "<leader>Y", [["+Y]], { desc = "Yank line to clipboard" })
-map({ "n", "v" }, "<leader>d", [["_d]], { desc = "Delete without yank" })
+-- Visual-only so normal-mode <leader>d stays free for the debug group.
+map("x", "<leader>d", [["_d]], { desc = "Delete without yank" })
 map("x", "<leader>p", [["_dP]], { desc = "Paste keeping register" })
 
 -- ── Windows & splits ────────────────────────────────────────────
@@ -39,7 +40,7 @@ map("n", "<leader>sv", "<C-w>v", { desc = "Split vertical" })
 map("n", "<leader>ss", "<C-w>s", { desc = "Split horizontal" })
 map("n", "<leader>se", "<C-w>=", { desc = "Equalize splits" })
 map("n", "<leader>sx", "<cmd>close<cr>", { desc = "Close split" })
-map("n", "<leader>m", function() require("utils").toggle_maximize() end, { desc = "Maximize split (toggle)" })
+map("n", "<leader>sm", function() require("utils").toggle_maximize() end, { desc = "Maximize split (toggle)" })
 map("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Grow height" })
 map("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Shrink height" })
 map("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Shrink width" })
@@ -69,6 +70,16 @@ map("n", "<leader>t\\", wez("vsplit_file_dir"), { desc = "WezTerm: split right (
 map("n", "<leader>t-", wez("hsplit_file_dir"), { desc = "WezTerm: split down (file's dir)" })
 
 -- ── Workflow ────────────────────────────────────────────────────
-map("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<cr>", { desc = "tmux sessionizer" })
+-- (Note: <C-f> is left to neoscroll for animated page-down; the old
+-- tmux-sessionizer binding was removed now that WezTerm is the primary term.)
 map("n", "<leader>ur", function() require("utils").reload() end, { desc = "Reload Umbra config" })
+map("n", "<leader>uM", function() require("umbra.motion").toggle() end, { desc = "Reduce motion (toggle)" })
 map("n", "<leader>X", "<cmd>!chmod +x %<cr>", { desc = "Make file executable", silent = true })
+map("n", "<leader>P", "<cmd>Telescope commands<cr>", { desc = "Command palette" })
+
+-- ── Health & performance ────────────────────────────────────────
+vim.api.nvim_create_user_command("UmbraHealth", function()
+  require("features.health").show()
+end, { desc = "Umbra health / performance report" })
+map("n", "<leader>uh", "<cmd>UmbraHealth<cr>", { desc = "Health / performance" })
+map("n", "<leader>up", "<cmd>Lazy profile<cr>", { desc = "Plugin profile" })

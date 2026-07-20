@@ -1,11 +1,28 @@
--- Umbra theme loader.
--- `require("themes.umbra").apply()` paints the whole editor. The palette is
--- exposed so statusline/bufferline/etc. can consume the exact same colors.
+--- Umbra — a premium handcrafted Neovim colorscheme.
+--- Modular architecture: palette → groups → treesitter → lsp → plugins.
+---
+--- Usage:
+---   require("themes.umbra").setup({ transparent = true })
+---   vim.cmd.colorscheme("umbra")
+
+local config = require("themes.umbra.config")
+local terminal = require("themes.umbra.terminal")
 
 local M = {}
 
-M.palette = require("themes.umbra.palette")
+M.config = config.merge()
+M.base_palette = require("themes.umbra.palette")
+M.palette = M.base_palette
 
+--- Resolved palette after the last apply (for lualine, dashboard, etc.).
+M.resolved = nil
+
+---@param opts? UmbraConfig
+function M.setup(opts)
+  M.config = config.merge(opts)
+end
+
+--- Paint every highlight group. Called by `:colorscheme umbra`.
 function M.apply()
   if vim.g.colors_name then
     vim.cmd("hi clear")
@@ -14,28 +31,27 @@ function M.apply()
   vim.o.background = "dark"
   vim.g.colors_name = "umbra"
 
-  local p = M.palette
-  local groups = require("themes.umbra.highlights")(p)
+  local groups, resolved = require("themes.umbra.highlights")(M.base_palette, M.config)
+  M.resolved = resolved
+  M.palette = resolved
+
   local set_hl = vim.api.nvim_set_hl
   for group, spec in pairs(groups) do
     set_hl(0, group, spec)
   end
 
-  -- Terminal ANSI palette (toggleterm, :terminal, lazygit)
-  local t = p.terminal
-  local ansi = {
-    t.black, t.red, t.green, t.yellow, t.blue, t.magenta, t.cyan, t.white,
-    t.bright_black, t.bright_red, t.bright_green, t.bright_yellow,
-    t.bright_blue, t.bright_magenta, t.bright_cyan, t.bright_white,
-  }
-  for i, color in ipairs(ansi) do
-    vim.g["terminal_color_" .. (i - 1)] = color
-  end
+  terminal.apply(resolved, M.config.terminal)
+
+  -- Sync design-system color layer with the resolved palette.
+  pcall(function()
+    package.loaded["umbra.color"] = nil
+    require("umbra.color")
+  end)
 end
 
--- lualine theme derived from the palette (kept here so colors never drift).
+--- Lualine segment theme derived from the active palette.
 function M.lualine()
-  local p = M.palette
+  local p = M.resolved or M.palette
   local a = p.accent
   local function seg(accent)
     return {
@@ -46,11 +62,11 @@ function M.lualine()
   end
   return {
     normal = seg(a.indigo),
-    insert = seg(a.green),
-    visual = seg(a.violet),
+    insert = seg(a.emerald),
+    visual = seg(a.purple),
     replace = seg(a.rose),
-    command = seg(a.sand),
-    terminal = seg(a.teal),
+    command = seg(a.orange),
+    terminal = seg(a.cyan),
     inactive = {
       a = { fg = p.fg.muted, bg = p.none },
       b = { fg = p.fg.muted, bg = p.none },

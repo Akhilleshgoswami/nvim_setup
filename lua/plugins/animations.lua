@@ -1,4 +1,8 @@
 -- Tasteful motion. Nothing flashy — just momentum that reinforces focus.
+-- Every animation reads the same clock (umbra.motion): one easing, one tempo,
+-- so nothing feels faster or slower than anything else. `<leader>uM` reduces it.
+
+local motion = require("umbra.motion")
 
 return {
   -- Smooth, eased scrolling for page/half-page/search jumps.
@@ -11,16 +15,16 @@ return {
       stop_eof = true,
       respect_scrolloff = true,
       cursor_scrolls_alone = true,
-      easing_function = "sine",
-      duration_multiplier = 0.6,
+      easing_function = motion.easing,
+      duration_multiplier = motion.scroll_multiplier,
     },
   },
 
-  -- A soft animated cursor trail in the terminal.
+  -- A soft animated cursor trail in the terminal. Toggled via `<leader>uM`
+  -- (reduce motion) — smear is the most prominent movement in the editor.
   {
     "sphamba/smear-cursor.nvim",
     event = "VeryLazy",
-    keys = { { "<leader>uC", "<cmd>SmearCursorToggle<cr>", desc = "Toggle cursor smear" } },
     opts = {
       stiffness = 0.8,
       trailing_stiffness = 0.6,

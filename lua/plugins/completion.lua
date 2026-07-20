@@ -1,7 +1,8 @@
--- Completion: blink.cmp with LuaSnip, Copilot, buffer, path and ripgrep.
+-- Completion: blink.cmp with LuaSnip, buffer, path and ripgrep.
 -- VS Code feel: Tab accepts, Enter accepts, ghost text previews.
 
-local icons = require("utils.icons")
+local icons = require("umbra.icons")
+local ui = require("umbra.tokens")
 
 return {
   {
@@ -31,9 +32,7 @@ return {
           })
         end,
       },
-      "fang2hou/blink-copilot",
       "mikavilpas/blink-ripgrep.nvim",
-      "zbirenbaum/copilot.lua",
     },
     opts = {
       snippets = { preset = "luasnip" },
@@ -64,7 +63,7 @@ return {
 
       appearance = {
         nerd_font_variant = "mono",
-        kind_icons = vim.tbl_extend("force", icons.kinds, { Copilot = icons.kinds.Copilot }),
+        kind_icons = icons.kinds,
       },
 
       completion = {
@@ -74,12 +73,12 @@ return {
         accept = { auto_brackets = { enabled = true } },
         ghost_text = { enabled = true },
         menu = {
-          border = "rounded",
-          winblend = 0,
+          border = ui.border,
+          winblend = ui.opacity.float,
           scrollbar = false,
           draw = {
-            padding = 1,
-            gap = 1,
+            padding = ui.space.xs,
+            gap = ui.space.xs,
             treesitter = { "lsp" },
             columns = {
               { "kind_icon" },
@@ -91,30 +90,23 @@ return {
         documentation = {
           auto_show = true,
           auto_show_delay_ms = 150,
-          window = { border = "rounded", winblend = 0 },
+          window = { border = ui.border, winblend = ui.opacity.float },
         },
       },
 
       signature = {
         enabled = true,
-        window = { border = "rounded", winblend = 0 },
+        window = { border = ui.border, winblend = ui.opacity.float },
       },
 
       sources = {
-        default = { "lsp", "path", "snippets", "copilot", "buffer", "ripgrep" },
+        default = { "lsp", "path", "snippets", "buffer", "ripgrep" },
         per_filetype = {
           sql = { "dadbod", "snippets", "buffer" },
           mysql = { "dadbod", "snippets", "buffer" },
         },
         providers = {
           lsp = { name = "LSP", score_offset = 90 },
-          copilot = {
-            module = "blink-copilot",
-            name = "Copilot",
-            score_offset = 100,
-            async = true,
-            opts = { max_completions = 3 },
-          },
           ripgrep = {
             module = "blink-ripgrep",
             name = "Ripgrep",

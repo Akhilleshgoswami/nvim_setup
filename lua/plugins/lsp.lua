@@ -1,5 +1,7 @@
 -- Language intelligence: servers, formatting, folding, progress.
 
+local ui = require("umbra.tokens")
+
 return {
   -- ── Mason (installer) ──────────────────────────────────────────
   {
@@ -8,9 +10,9 @@ return {
     build = ":MasonUpdate",
     opts = {
       ui = {
-        border = "rounded",
-        width = 0.8,
-        height = 0.8,
+        border = ui.border,
+        width = ui.float.lg.width,
+        height = ui.float.lg.height,
         icons = { package_installed = "●", package_pending = "◍", package_uninstalled = "○" },
       },
     },
@@ -25,8 +27,12 @@ return {
       run_on_start = true,
       start_delay = 3000,
       ensure_installed = {
+        -- formatters / linters
         "stylua", "prettier", "prettierd", "goimports", "gofumpt",
         "shfmt", "sql-formatter", "hadolint",
+        -- debug adapters (installed here via one coordinated installer to
+        -- avoid mason "already installing" races).
+        "js-debug-adapter", "delve", "debugpy",
       },
     },
   },
@@ -34,7 +40,8 @@ return {
   -- ── LSP configuration ──────────────────────────────────────────
   {
     "neovim/nvim-lspconfig",
-    event = { "BufReadPre", "BufNewFile" },
+    -- Must be ready before Telescope can open a file from the dashboard.
+    lazy = false,
     dependencies = {
       { "williamboman/mason.nvim", opts = {} },
       "williamboman/mason-lspconfig.nvim",
@@ -65,8 +72,18 @@ return {
 
       require("mason-lspconfig").setup({
         ensure_installed = vim.tbl_keys(servers),
-        automatic_enable = true,
+        -- vtsls replaces ts_ls; glint is Ember-only and not in our stack.
+        automatic_enable = { exclude = { "ts_ls", "glint" } },
       })
+
+      -- Belt-and-suspenders: never spawn optional servers we don't configure.
+      pcall(vim.lsp.enable, "glint", false)
+
+      vim.schedule(function()
+        require("features.intelligence").ensure_buffers()
+      end)
+
+      vim.g.umbra_lsp_ready = true
     end,
   },
 

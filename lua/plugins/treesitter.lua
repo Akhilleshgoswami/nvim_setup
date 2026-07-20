@@ -6,7 +6,9 @@ return {
     "nvim-treesitter/nvim-treesitter",
     branch = "master",
     build = ":TSUpdate",
-    event = { "BufReadPost", "BufNewFile", "BufWritePre" },
+    -- Load on VeryLazy so highlighting is ready before dashboard → Telescope.
+    lazy = vim.fn.argc(-1) == 0,
+    event = { "VeryLazy", "BufReadPost", "BufNewFile" },
     cmd = { "TSUpdate", "TSInstall", "TSInstallInfo" },
     dependencies = {
       "nvim-treesitter/nvim-treesitter-textobjects",
@@ -81,6 +83,18 @@ return {
       })
 
       vim.treesitter.language.register("bash", "zsh")
+
+      vim.g.umbra_treesitter_ready = true
+      require("features.intelligence").ensure_treesitter()
+
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("umbra_treesitter_reattach", { clear = true }),
+        callback = function()
+          vim.schedule(function()
+            require("features.intelligence").ensure_treesitter()
+          end)
+        end,
+      })
     end,
   },
 

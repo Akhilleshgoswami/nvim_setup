@@ -1,4 +1,4 @@
-# NvChad Migration Report
+ # NvChad Migration Report
 
 This document describes the migration from the custom `akhilesh` Lazy.nvim configuration to **NvChad v2.5** as the base, while preserving your existing workflow and keymaps.
 

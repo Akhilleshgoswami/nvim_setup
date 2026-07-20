@@ -21,6 +21,8 @@ vim.opt.rtp:prepend(lazypath)
 -- never a flash of the default colorscheme.
 pcall(vim.cmd.colorscheme, "umbra")
 
+local ui = require("umbra.tokens")
+
 require("lazy").setup({
   spec = { { import = "plugins" } },
   defaults = { lazy = true },
@@ -28,8 +30,8 @@ require("lazy").setup({
   checker = { enabled = true, notify = false, frequency = 86400 },
   change_detection = { enabled = true, notify = false },
   ui = {
-    size = { width = 0.82, height = 0.8 },
-    border = "rounded",
+    size = { width = ui.float.lg.width, height = ui.float.lg.height },
+    border = ui.border,
     backdrop = 100,
     title = " lazy ",
     icons = {
@@ -55,6 +57,8 @@ require("lazy").setup({
 local theme = require("features.theme")
 theme.setup()
 theme.load_saved()
+
+require("features.intelligence").setup()
 
 -- Fast, discoverable access to the plugin manager.
 vim.keymap.set("n", "<leader>L", "<cmd>Lazy<cr>", { desc = "Lazy (plugins)" })

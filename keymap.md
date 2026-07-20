@@ -15,7 +15,7 @@ group live — press `Space` and wait, or `Space ?` for buffer-local maps.
 | `Esc` | Clear search highlight |
 | `Ctrl-s` | Save file (any mode) |
 | `Space w` / `Space W` | Save file / save all |
-| `Space c` | Close window |
+| `Space sx` | Close window |
 | `Space Q` | Quit all |
 | `Space ur` | Reload Umbra config |
 | `Space L` | Plugin manager (Lazy) |
@@ -45,12 +45,11 @@ group live — press `Space` and wait, or `Space ?` for buffer-local maps.
 | `Ctrl-h/j/k/l` | Move between windows (tmux-aware) |
 | `Space sv` / `Space ss` | Split vertical / horizontal |
 | `Space se` / `Space sx` | Equalize / close split |
-| `Space m` | Maximize split (toggle) |
+| `Space sm` | Maximize split (toggle) |
 | `Ctrl-Arrows` | Resize split |
-| `Tab` / `Shift-Tab` | Next / previous buffer |
+| `Tab` / `Shift-Tab` | Next / previous Harpoon pin (working set) |
 | `Space bd` / `Space bo` | Delete buffer / delete others |
-| `Space bp` | Pin buffer |
-| `Space b1/b2/b3` | Jump to buffer by position |
+| `Space bn` | New buffer |
 | `]q`/`[q`  `]l`/`[l` | Quickfix / location list nav |
 
 ## Find — `Space f` (Telescope)
@@ -83,14 +82,19 @@ splits or duplicate buffers.
 `gr` revert · `A` stage all · `gc` commit · `gp` push · `gg` commit + push ·
 `Enter`/`l` open the file. Filesystem source: `H` toggles hidden files.
 
-## Harpoon — `Space h`
+## Harpoon — the working set (`Space h`)
+
+Harpoon is Umbra's working set — the small, chosen list of files you move
+between all day. It replaces a bufferline entirely: the pins render in the
+statusline, and `Tab` / `Shift-Tab` cycle them like buffer tabs used to.
 
 | Key | Action |
 |---|---|
-| `Space ha` | Add file |
+| `Space ha` | Add file to the working set |
 | `Ctrl-e` | Toggle quick menu |
-| `Space hn` / `Space hp` | Next / previous mark |
-| `Space 1`–`Space 4` | Jump to file 1–4 |
+| `Tab` / `Shift-Tab` | Next / previous pin |
+| `Space hn` / `Space hp` | Next / previous pin |
+| `Space 1`–`Space 4` | Jump to pin 1–4 |
 
 ## LSP & Code — `Space c`, `Space r`
 
@@ -153,6 +157,8 @@ for quick throwaway shells.
 | `Ctrl-\` / `Space tt` | Toggle internal terminal |
 | `Space tf` `th` `tv` | Float / horizontal / vertical (internal) |
 | `Space t2` / `Space t3` | Extra internal terminals |
+| `Space tr` / `Space tR` | Run project / run tests (auto-detected) |
+| `Space tn` / `Space tD` | Pick npm script / Docker menu |
 | `Esc Esc` (term) | To normal mode |
 | `Ctrl-h/j/k/l` (term) | Move between windows |
 
@@ -179,16 +185,34 @@ Leader is `Ctrl-a` (tmux-style); `⌘` bindings mirror macOS/IDE habits.
 | `⌘ ⇧ ⏎` | Toggle fullscreen |
 | `Leader Ctrl-a` | Send a literal Ctrl-a (Neovim increment) |
 
-## AI — `Space a`
+## Debug — `Space d` / function keys (nvim-dap)
+
+Breakpoints persist per project. Adapters (js-debug, delve, debugpy) auto-install.
 
 | Key | Action |
 |---|---|
-| `Space aa` / `Space ac` | AI actions / chat toggle (CodeCompanion) |
-| `Space ai` / `Space ad` | Inline prompt / add selection to chat |
-| `Space av` / `Space aA` / `Space ae` | Avante toggle / ask / edit selection |
-| `Space aC` / `Space as` / `Space af` | Claude Code toggle / send / focus |
+| `F5` / `Space dc` | Start / continue |
+| `F10` `F11` `⇧F11` | Step over / into / out |
+| `F9` / `Space db` | Toggle breakpoint |
+| `Space dB` / `Space dl` | Conditional breakpoint / log point |
+| `Space du` / `Space dr` | Toggle UI / REPL |
+| `Space de` / `Space dw` | Eval expression / watch |
+| `Space dt` / `Space dR` / `Space dp` | Terminate / restart / pause |
+| `Space dC` / `Space dX` | Run to cursor / clear breakpoints |
 
-> Copilot suggestions appear inline as ghost text and in the completion menu.
+## Markdown — `Space m`
+
+| Key | Action |
+|---|---|
+| `Space mp` | Toggle browser preview (Mermaid + KaTeX) |
+| `Space mi` | Paste image from clipboard |
+
+## Health & performance
+
+| Key | Action |
+|---|---|
+| `Space uh` / `:UmbraHealth` | Snapshot: startup, slow plugins, LSP, treesitter, formatter, git |
+| `Space up` | Full per-plugin load profile (`:Lazy profile`) |
 
 ## Folds
 
@@ -204,7 +228,7 @@ Leader is `Ctrl-a` (tmux-style); `⌘` bindings mirror macOS/IDE habits.
 |---|---|
 | `Space ut` / `:Theme` | Theme picker (live preview, remembered on restart) |
 | `Space uu` / `Space uz` | Undo tree / Zen mode |
-| `Space uD` / `Space uC` | Database UI / toggle cursor smear |
+| `Space uD` / `Space uM` | Database UI / reduce motion (toggle) |
 | `Space un` / `Space nd` | Dismiss notifications |
 | `Space na` / `Space nl` | Notification history / last message |
 | `Space ql` `qs` `qd` | Session restore / save / delete |
@@ -239,6 +263,8 @@ are selectable directly from the picker.
 
 | Key | Action |
 |---|---|
-| `Ctrl-f` | tmux-sessionizer |
+| `Space P` | Command palette (commands) |
+| `Space pp` | Switch project |
 | `Space X` | `chmod +x` current file |
+| `Space ur` | Reload config |
 | `Space ?` | Buffer-local keymaps (which-key) |

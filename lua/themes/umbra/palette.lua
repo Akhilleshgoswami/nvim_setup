@@ -1,88 +1,102 @@
--- Umbra — a bespoke, low-contrast premium dark palette.
--- Cool graphite base, soft off-white foreground, desaturated accents.
--- Tuned for 10+ hour sessions: nothing screams, everything reads.
+--- Umbra — a handcrafted dark palette.
+--- Soft blue-gray surfaces inspired by Linear, Raycast, and GitHub Dark Modern.
+--- Optimized for 13–14" laptops: lifted background (~15%), muted text (~88%),
+--- clear elevation layers, and desaturated syntax — not near-black OLED crush.
 
 local M = {}
 
+-- ── Surfaces (elevation layers) ─────────────────────────────────
 M.bg = {
-  base = "#101216", -- editor background (very dark, faint blue)
-  dark = "#0B0C10", -- statusline caps / darker gutters
-  panel = "#0E0F13", -- sidebars: neo-tree, trouble, aerial
-  float = "#15171D", -- floating windows / popups
-  overlay = "#191C23", -- nested floats / menus over floats
-  active = "#1E222B", -- selected menu item / picker cursor row
-  cursorline = "#181B22",
-  selection = "#293040", -- visual selection (muted blue-gray)
-  search = "#3A4152", -- search match backdrop
-  match = "#2A3140", -- matchparen
+  base = "#1A1E27", -- main editor
+  dark = "#202532", -- statusline / tabline
+  panel = "#202532", -- sidebar: neo-tree, trouble, aerial
+  float = "#252B3B", -- floating windows, popups
+  overlay = "#252B3B", -- nested surfaces / prompt row
+  elevated = "#2A3142", -- hover / secondary float
+  active = "#2F3850", -- selected row / menu item
+  cursorline = "#262D3F",
+  selection = "#2F3850", -- visual selection
+  search = "#343D52", -- search match backdrop
+  match = "#2F3850", -- matchparen
 }
 
+-- ── Foreground ──────────────────────────────────────────────────
 M.fg = {
-  base = "#C6CAD4", -- primary text (soft, never pure white)
-  dim = "#9AA0AE", -- secondary text
-  muted = "#6B7280", -- inactive line numbers, ghost UI
-  faint = "#3D424D", -- borders-as-text, indent guides
-  comment = "#565D6D", -- comments (recessed but legible)
+  base = "#E5E9F0", -- primary text (~88% brightness)
+  dim = "#D8DEE9", -- parameters, secondary prose
+  muted = "#8B95A7", -- inactive UI, metadata
+  faint = "#6D7890", -- line numbers, guides
+  comment = "#8B95A7", -- recessed but readable
 }
 
-M.border = "#242A35" -- refined float / split borders
-M.border_bright = "#333B49" -- active window edge
+M.border = "#343D52"
+M.border_bright = "#3D4660"
 
--- Accents — desaturated, premium. Used sparingly.
+-- ── Accents (slightly muted, never neon) ────────────────────────
 M.accent = {
-  rose = "#EB6F82", -- errors, deletions, tags
-  coral = "#E8956B", -- rarely used warm
-  peach = "#E8A87C", -- numbers, constants, booleans
-  sand = "#E6C58C", -- types, attributes, warnings
-  green = "#9BD09E", -- strings, additions
-  teal = "#5FD1BE", -- escapes, regex, special, hints
-  sky = "#9DC7E0", -- properties, fields
-  blue = "#7FA7F0", -- functions, info
-  indigo = "#8E9BF2", -- primary UI accent (normal mode)
-  violet = "#B39DF3", -- keywords
-  mauve = "#C79BE6", -- decorators, uncommon keywords
-  pink = "#DB9BD0", -- special identifiers
+  blue = "#82AAFF", -- functions, links, info
+  cyan = "#7FD1C5", -- types, hints
+  emerald = "#A3D977", -- strings, success, git add
+  purple = "#C792EA", -- keywords
+  orange = "#F7C66F", -- numbers, warnings
+  yellow = "#F7C66F", -- constants (numeric)
+  red = "#F07178", -- errors, tags
+  pink = "#F38BA8", -- constants, decorators
+  indigo = "#8FB4FF", -- UI chrome, active line number
+  teal = "#7FD1C5", -- types, labels
+  sand = "#F7C66F", -- attributes, enums
+  mauve = "#C792EA", -- imports, preproc
+  rose = "#F38BA8", -- deletions, builtins
+  peach = "#F7C66F", -- floats, booleans
+  green = "#A3D977", -- alias for emerald
+  violet = "#C792EA", -- alias for purple
+  sky = "#89B4FA", -- operators, properties, fields
+  coral = "#E8956B",
 }
 
--- Semantic git colors
+-- ── Git ─────────────────────────────────────────────────────────
 M.git = {
-  add = "#7FC891",
-  change = "#D8B673",
-  delete = "#D97284",
-  conflict = "#C79BE6",
-  ignored = "#565D6D",
-  untracked = "#7FA7F0",
+  add = "#A3D977",
+  change = "#82AAFF",
+  delete = "#F07178",
+  conflict = "#C792EA",
+  ignored = "#6D7890",
+  untracked = "#82AAFF",
+  renamed = "#7FD1C5",
 }
 
--- Diagnostics (soft)
+-- ── Diagnostics ─────────────────────────────────────────────────
 M.diag = {
-  error = "#E5788A",
-  warn = "#E4C08A",
-  info = "#82A9F0",
-  hint = "#67C7B8",
-  ok = "#9BD09E",
+  error = "#F07178",
+  warn = "#F7C66F",
+  info = "#82AAFF",
+  hint = "#7FD1C5",
+  ok = "#A3D977",
 }
 
--- Terminal ANSI (cohesive with syntax)
+-- ── Terminal ANSI (matched to editor warmth) ────────────────────
 M.terminal = {
-  black = "#191C23",
-  red = "#EB6F82",
-  green = "#9BD09E",
-  yellow = "#E6C58C",
-  blue = "#7FA7F0",
-  magenta = "#B39DF3",
-  cyan = "#5FD1BE",
-  white = "#C6CAD4",
-  bright_black = "#565D6D",
-  bright_red = "#EF8496",
-  bright_green = "#AAD9AC",
-  bright_yellow = "#EDCF9E",
-  bright_blue = "#96B8F4",
-  bright_magenta = "#C3B0F6",
-  bright_cyan = "#7CD9C9",
-  bright_white = "#E4E7EE",
+  black = "#1A1E27",
+  red = "#F07178",
+  green = "#A3D977",
+  yellow = "#F7C66F",
+  blue = "#82AAFF",
+  magenta = "#C792EA",
+  cyan = "#7FD1C5",
+  white = "#E5E9F0",
+  bright_black = "#6D7890",
+  bright_red = "#F38BA8",
+  bright_green = "#B8E986",
+  bright_yellow = "#FAD07B",
+  bright_blue = "#8FB4FF",
+  bright_magenta = "#D4A5F5",
+  bright_cyan = "#95E0D8",
+  bright_white = "#F0F3F8",
 }
 
 M.none = "NONE"
+
+--- Fallback base when transparent mode strips bg.base.
+M.fallback_base = "#1A1E27"
 
 return M
