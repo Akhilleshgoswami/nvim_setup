@@ -207,13 +207,14 @@ return function(p, sem, cfg)
   hl.IblWhitespace = { fg = sem.indent }
   hl.IblScope = { fg = p.border_bright }
 
-  hl.RainbowDelimiterRed = { fg = acc.red }
-  hl.RainbowDelimiterYellow = { fg = acc.yellow }
-  hl.RainbowDelimiterBlue = { fg = acc.blue }
-  hl.RainbowDelimiterOrange = { fg = acc.orange }
-  hl.RainbowDelimiterGreen = { fg = acc.emerald }
-  hl.RainbowDelimiterViolet = { fg = acc.purple }
-  hl.RainbowDelimiterCyan = { fg = acc.cyan }
+  -- Soft rainbow — muted toward the palette so nesting stays calm.
+  hl.RainbowDelimiterRed = { fg = "#B87A88" }
+  hl.RainbowDelimiterYellow = { fg = "#C4A86A" }
+  hl.RainbowDelimiterBlue = { fg = "#7A96C8" }
+  hl.RainbowDelimiterOrange = { fg = "#C4926A" }
+  hl.RainbowDelimiterGreen = { fg = "#8AB87A" }
+  hl.RainbowDelimiterViolet = { fg = "#A888C8" }
+  hl.RainbowDelimiterCyan = { fg = "#78B8B0" }
 
   hl.TreesitterContext = { bg = bg.elevated }
   hl.TreesitterContextLineNumber = { fg = fg.muted, bg = bg.elevated }
@@ -334,17 +335,39 @@ return function(p, sem, cfg)
   hl.BufferLineBackground = { fg = fg.muted, bg = bg.dark }
   hl.BufferLineBuffer = { fg = fg.muted, bg = bg.dark }
   hl.BufferLineBufferVisible = { fg = fg.dim, bg = bg.dark }
-  hl.BufferLineBufferSelected = { fg = fg.base, bg = bg.base, bold = true }
+  hl.BufferLineBufferSelected = { fg = fg.base, bg = bg.base, bold = true, italic = false }
   hl.BufferLineTab = { fg = fg.muted, bg = bg.dark }
-  hl.BufferLineTabSelected = { fg = fg.base, bg = bg.base }
-  hl.BufferLineIndicatorSelected = { fg = acc.indigo, bg = bg.base }
+  hl.BufferLineTabSelected = { fg = fg.base, bg = bg.base, bold = true }
+  hl.BufferLineTabClose = { fg = fg.muted, bg = bg.dark }
+  hl.BufferLineIndicatorSelected = { fg = acc.indigo, bg = bg.base, sp = acc.indigo, underline = true }
   hl.BufferLineIndicatorVisible = { fg = bg.dark, bg = bg.dark }
-  hl.BufferLineModified = { fg = acc.orange }
+  hl.BufferLineModified = { fg = acc.orange, bg = bg.dark }
+  hl.BufferLineModifiedVisible = { fg = acc.orange, bg = bg.dark }
   hl.BufferLineModifiedSelected = { fg = acc.orange, bg = bg.base }
-  hl.BufferLineCloseButton = { fg = fg.muted }
+  hl.BufferLineCloseButton = { fg = fg.faint, bg = bg.dark }
+  hl.BufferLineCloseButtonVisible = { fg = fg.muted, bg = bg.dark }
   hl.BufferLineCloseButtonSelected = { fg = fg.dim, bg = bg.base }
   hl.BufferLineSeparator = { fg = bg.dark, bg = bg.dark }
+  hl.BufferLineSeparatorVisible = { fg = bg.dark, bg = bg.dark }
   hl.BufferLineSeparatorSelected = { fg = bg.base, bg = bg.base }
+  hl.BufferLineDuplicate = { fg = fg.faint, bg = bg.dark, italic = true }
+  hl.BufferLineDuplicateVisible = { fg = fg.faint, bg = bg.dark, italic = true }
+  hl.BufferLineDuplicateSelected = { fg = fg.muted, bg = bg.base, italic = true }
+  hl.BufferLineError = { fg = diag.error, bg = bg.dark }
+  hl.BufferLineErrorVisible = { fg = diag.error, bg = bg.dark }
+  hl.BufferLineErrorSelected = { fg = diag.error, bg = bg.base, bold = true, sp = diag.error, underline = true }
+  hl.BufferLineWarning = { fg = diag.warn, bg = bg.dark }
+  hl.BufferLineWarningVisible = { fg = diag.warn, bg = bg.dark }
+  hl.BufferLineWarningSelected = { fg = diag.warn, bg = bg.base, bold = true, sp = diag.warn, underline = true }
+  hl.BufferLineInfo = { fg = diag.info, bg = bg.dark }
+  hl.BufferLineInfoSelected = { fg = diag.info, bg = bg.base, sp = diag.info, underline = true }
+  hl.BufferLineHint = { fg = diag.hint, bg = bg.dark }
+  hl.BufferLineHintSelected = { fg = diag.hint, bg = bg.base, sp = diag.hint, underline = true }
+  hl.BufferLinePick = { fg = acc.rose, bg = bg.dark, bold = true }
+  hl.BufferLinePickSelected = { fg = acc.rose, bg = bg.base, bold = true }
+  hl.BufferLineOffsetSeparator = { fg = p.border, bg = bg.dark }
+  hl.BufferLineDevIconDefaultSelected = { bg = bg.base }
+  hl.BufferLineDevIconDefaultInactive = { bg = bg.dark }
 
   -- ── diffview / fugitive / neogit ───────────────────────────────
   hl.DiffviewPrimary = { fg = acc.indigo }

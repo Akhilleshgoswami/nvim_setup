@@ -21,7 +21,8 @@ return {
           "gowork", "graphql", "html", "http", "javascript", "jsdoc", "json",
           "jsonc", "lua", "luadoc", "luap", "markdown", "markdown_inline",
           "prisma", "python", "query", "regex", "rust", "scss", "sql", "toml",
-          "tsx", "typescript", "vim", "vimdoc", "yaml",
+          "tsx", "typescript", "vim", "vimdoc", "yaml", "zig", "svelte", "vue",
+          "ninja", "make", "cmake", "proto",
         },
         auto_install = true,
         sync_install = false,
@@ -113,5 +114,38 @@ return {
     "folke/ts-comments.nvim",
     event = "VeryLazy",
     opts = {},
+  },
+
+  -- Subtle rainbow parentheses — desaturated, never neon.
+  {
+    "HiPhish/rainbow-delimiters.nvim",
+    event = { "BufReadPost", "BufNewFile" },
+    config = function()
+      local rainbow = require("rainbow-delimiters")
+      require("rainbow-delimiters.setup").setup({
+        strategy = {
+          [""] = rainbow.strategy["global"],
+          vim = rainbow.strategy["local"],
+        },
+        query = {
+          [""] = "rainbow-delimiters",
+          lua = "rainbow-blocks",
+          javascript = "rainbow-delimiters-react",
+          typescript = "rainbow-delimiters-react",
+          tsx = "rainbow-delimiters-react",
+          javascriptreact = "rainbow-delimiters-react",
+          typescriptreact = "rainbow-delimiters-react",
+        },
+        highlight = {
+          "RainbowDelimiterBlue",
+          "RainbowDelimiterCyan",
+          "RainbowDelimiterViolet",
+          "RainbowDelimiterGreen",
+          "RainbowDelimiterOrange",
+          "RainbowDelimiterYellow",
+          "RainbowDelimiterRed",
+        },
+      })
+    end,
   },
 }

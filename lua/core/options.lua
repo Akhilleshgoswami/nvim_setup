@@ -17,12 +17,17 @@ o.colorcolumn = "+1"
 o.termguicolors = true
 o.showmode = false -- lualine owns the mode
 o.laststatus = 3 -- single global statusline
+o.showtabline = 0 -- no bufferline / tabline
 o.cmdheight = 0 -- noice owns the cmdline; reclaim the row
 o.pumheight = 12
 o.pumblend = 0
 o.winblend = 0
 o.scrolloff = 8
 o.sidescrolloff = 8
+-- Typography: extra line height for long sessions on 13–14" displays.
+-- Pair with Berkeley Mono / MonoLisa / JetBrains Mono / Geist Mono at 14–15px
+-- in your terminal emulator (WezTerm / Alacritty / Kitty).
+o.linespace = 2
 o.wrap = false
 o.linebreak = true
 o.breakindent = true

@@ -15,24 +15,24 @@ return {
       stop_eof = true,
       respect_scrolloff = true,
       cursor_scrolls_alone = true,
-      easing_function = motion.easing,
+      easing = motion.easing,
       duration_multiplier = motion.scroll_multiplier,
     },
   },
 
-  -- A soft animated cursor trail in the terminal. Toggled via `<leader>uM`
-  -- (reduce motion) — smear is the most prominent movement in the editor.
+  -- Soft animated cursor trail. Toggled via `<leader>uM` (reduce motion).
   {
     "sphamba/smear-cursor.nvim",
     event = "VeryLazy",
     opts = {
-      stiffness = 0.8,
-      trailing_stiffness = 0.6,
-      trailing_exponent = 1.2,
+      stiffness = 0.72,
+      trailing_stiffness = 0.55,
+      trailing_exponent = 1.1,
       distance_stop_animating = 0.5,
       smear_between_buffers = true,
-      smear_between_neighbor_lines = true,
+      smear_between_neighbor_lines = false,
       smear_insert_mode = false,
+      time_interval = math.floor(1000 / motion.fps),
     },
   },
 }

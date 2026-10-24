@@ -1,6 +1,5 @@
--- A minimal, information-rich start screen. No ASCII murals — just the context
--- an engineer wants at a glance: project, branch, working-tree state, recent
--- files, plugin health, startup time, and one quiet line to think on.
+-- Premium start screen: wordmark, project context, actions, recent files,
+-- session restore, and a live health footer.
 
 local icons = require("umbra.icons")
 local ui = require("umbra.tokens")
@@ -25,17 +24,19 @@ return {
       "Perfection is achieved when there is nothing left to take away.",
     }
 
-    -- ── Header: a restrained wordmark ──
+    -- Restrained NVIM wordmark.
     dashboard.section.header.val = {
-      "",
-      "        ▟▙   U M B R A",
-      "       ▝▀▘   a handcrafted neovim environment",
+      "                                            ",
+      "  ███╗   ██╗██╗   ██╗██╗███╗   ███╗         ",
+      "  ████╗  ██║██║   ██║██║████╗ ████║         ",
+      "  ██╔██╗ ██║██║   ██║██║██╔████╔██║         ",
+      "  ██║╚██╗██║╚██╗ ██╔╝██║██║╚██╔╝██║         ",
+      "  ██║ ╚████║ ╚████╔╝ ██║██║ ╚═╝ ██║         ",
+      "  ╚═╝  ╚═══╝  ╚═══╝  ╚═╝╚═╝     ╚═╝         ",
       "",
     }
     dashboard.section.header.opts.hl = "AlphaHeader"
 
-    -- Branch + working-tree state in a single git call (kept off the hot path:
-    -- the dashboard only renders when Neovim opens with no file arguments).
     local function git_info()
       local out = vim.fn.systemlist("git status --porcelain=v1 --branch 2>/dev/null")
       if vim.v.shell_error ~= 0 or not out[1] then
@@ -45,7 +46,6 @@ return {
       return branch, math.max(0, #out - 1)
     end
 
-    -- ── Project context line: name · branch · clean/N changed ──
     local function context()
       local cwd = vim.fn.fnamemodify(vim.uv.cwd() or "", ":t")
       local parts = { cwd }
@@ -58,13 +58,12 @@ return {
       return "  " .. table.concat(parts, "     ")
     end
 
-    -- ── Recent files (cwd-scoped, existing only) ──
     local function recent_buttons()
       local buttons = {}
       local cwd = (vim.uv.cwd() or "") .. "/"
       local seen, count = {}, 0
       for _, file in ipairs(vim.v.oldfiles or {}) do
-        if count >= 5 then break end
+        if count >= 6 then break end
         if file:find(cwd, 1, true) == 1 and vim.uv.fs_stat(file) and not seen[file] then
           seen[file] = true
           count = count + 1
@@ -82,7 +81,6 @@ return {
       return buttons
     end
 
-    -- ── Actions ──
     dashboard.section.buttons.val = {
       dashboard.button("f", "󰈞  Find file", function() require("telescope.builtin").find_files({ hidden = true }) end),
       dashboard.button("g", "󰊄  Live grep", function() require("telescope.builtin").live_grep() end),
@@ -95,6 +93,7 @@ return {
       dashboard.button("c", "  Config", function()
         require("telescope.builtin").find_files({ cwd = vim.fn.stdpath("config"), hidden = true })
       end),
+      dashboard.button("u", "󰚰  Update plugins", "<cmd>Lazy update<cr>"),
       dashboard.button("l", "󰒲  Plugins", "<cmd>Lazy<cr>"),
       dashboard.button("q", "󰩈  Quit", "<cmd>qa<cr>"),
     }
@@ -114,7 +113,6 @@ return {
       opts = { position = "center", hl = "AlphaHeaderLabel" },
     }
 
-    -- Token-driven vertical rhythm — no arbitrary padding.
     dashboard.config.layout = {
       { type = "padding", val = ui.space.sm },
       dashboard.section.header,
@@ -131,12 +129,10 @@ return {
     }
 
     dashboard.section.footer.opts.hl = "AlphaFooter"
+    dashboard.config.opts.noautocmd = true
 
     alpha.setup(dashboard.config)
 
-    -- Footer carries live status: plugins, load, startup ms, pending updates,
-    -- and (resolved asynchronously so it never delays startup) the repo's TODO
-    -- count, closing with the quote of the day.
     vim.api.nvim_create_autocmd("UIEnter", {
       once = true,
       callback = function()

@@ -56,7 +56,7 @@ local function on_attach(client, bufnr)
 
   -- Inlay hints (on by default where supported).
   if client:supports_method("textDocument/inlayHint") then
-    vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+    vim.lsp.inlay_hint.enable(false, { bufnr = bufnr })
     map("n", "<leader>ch", function()
       vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr }), { bufnr = bufnr })
     end, "Toggle inlay hints")

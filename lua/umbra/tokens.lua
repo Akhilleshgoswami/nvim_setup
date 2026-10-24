@@ -23,7 +23,7 @@ M.panel = {
 M.float = {
   sm = { width = 0.40, height = 0.40 },
   md = { width = 0.62, height = 0.62 },
-  lg = { width = 0.82, height = 0.80 },
+  lg = { width = 0.80, height = 0.80 }, -- terminal / primary floats
 }
 
 -- Opacity (winblend). Umbra is crisp by default; backdrop dims the world

@@ -65,7 +65,7 @@ return function(p, sem, cfg)
     ["@comment.note"] = { fg = bg.dark, bg = acc.cyan, bold = true },
     ["@type"] = { fg = acc.teal },
     ["@type.builtin"] = { fg = acc.teal, italic = true },
-    ["@type.definition"] = { fg = acc.teal },
+    ["@type.definition"] = { fg = acc.teal, bold = true },
     ["@type.qualifier"] = { fg = acc.purple },
     ["@attribute"] = { fg = acc.mauve },
     ["@attribute.builtin"] = { fg = acc.mauve },
@@ -73,6 +73,11 @@ return function(p, sem, cfg)
     ["@field"] = { fg = acc.sky },
     ["@namespace"] = { fg = acc.teal },
     ["@decorator"] = { fg = acc.pink },
+    -- Class / interface / enum distinction (when captures exist)
+    ["@type.class"] = { fg = acc.orange },
+    ["@type.interface"] = { fg = acc.teal, italic = true },
+    ["@type.enum"] = { fg = acc.sand },
+    ["@constant.enum"] = { fg = acc.peach },
 
     -- Markdown / markup (Notion-like reading)
     ["@markup.heading"] = { fg = acc.indigo, bold = true },

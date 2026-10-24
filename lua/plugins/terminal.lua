@@ -37,11 +37,13 @@ return {
     direction = "float",
     float_opts = {
       border = ui.border,
-      width = function() return math.floor(vim.o.columns * ui.float.lg.width) end,
-      height = function() return math.floor(vim.o.lines * ui.float.lg.height) end,
+      width = function() return math.floor(vim.o.columns * 0.80) end,
+      height = function() return math.floor(vim.o.lines * 0.80) end,
       winblend = ui.opacity.float,
       title_pos = ui.title.pos,
     },
+    start_in_insert = true,
+    auto_scroll = true,
     highlights = {
       Normal = { link = "Normal" },
       FloatBorder = { link = "FloatBorder" },

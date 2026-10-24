@@ -6,21 +6,43 @@ return {
   -- ── Mason (installer) ──────────────────────────────────────────
   {
     "williamboman/mason.nvim",
-    cmd = { "Mason", "MasonInstall", "MasonUpdate", "MasonUninstall" },
+    lazy = false,
+    cmd = {
+      "Mason",
+      "MasonInstall",
+      "MasonUpdate",
+      "MasonUninstall",
+      "MasonUninstallAll",
+      "MasonUninstallSkip",
+      "MasonReinstall",
+    },
     build = ":MasonUpdate",
+    keys = {
+      { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason package manager" },
+      { "<leader>cu", function() require("features.mason_tools").uninstall_picker() end, desc = "Mason: uninstall package" },
+    },
     opts = {
       ui = {
         border = ui.border,
         width = ui.float.lg.width,
         height = ui.float.lg.height,
         icons = { package_installed = "●", package_pending = "◍", package_uninstalled = "○" },
+        keymaps = {
+          -- Default is shift+X — easy to miss; d matches VS Code / intuitive delete.
+          uninstall_package = "d",
+          toggle_help = "H",
+        },
       },
     },
+    config = function(_, opts)
+      require("mason").setup(opts)
+      require("features.mason_tools").setup_commands()
+    end,
   },
 
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
-    cmd = { "MasonToolsInstall", "MasonToolsUpdate" },
+    cmd = { "MasonToolsInstall", "MasonToolsUpdate", "MasonToolsClean" },
     event = "VeryLazy",
     dependencies = { "williamboman/mason.nvim" },
     opts = {
@@ -29,12 +51,16 @@ return {
       ensure_installed = {
         -- formatters / linters
         "stylua", "prettier", "prettierd", "goimports", "gofumpt",
-        "shfmt", "sql-formatter", "hadolint",
+        "shfmt", "sql-formatter", "hadolint", "ruff",
         -- debug adapters (installed here via one coordinated installer to
         -- avoid mason "already installing" races).
         "js-debug-adapter", "delve", "debugpy",
       },
     },
+    config = function(_, opts)
+      opts.ensure_installed = require("features.mason_tools").filter_ensure_installed(opts.ensure_installed)
+      require("mason-tool-installer").setup(opts)
+    end,
   },
 
   -- ── LSP configuration ──────────────────────────────────────────
@@ -43,7 +69,7 @@ return {
     -- Must be ready before Telescope can open a file from the dashboard.
     lazy = false,
     dependencies = {
-      { "williamboman/mason.nvim", opts = {} },
+      "williamboman/mason.nvim",
       "williamboman/mason-lspconfig.nvim",
       "b0o/schemastore.nvim",
       "saghen/blink.cmp",
@@ -71,7 +97,7 @@ return {
       end
 
       require("mason-lspconfig").setup({
-        ensure_installed = vim.tbl_keys(servers),
+        ensure_installed = require("features.mason_tools").filter_ensure_installed(vim.tbl_keys(servers)),
         -- vtsls replaces ts_ls; glint is Ember-only and not in our stack.
         automatic_enable = { exclude = { "ts_ls", "glint" } },
       })

@@ -54,16 +54,44 @@ return {
     },
   },
 
-  -- ── Markdown: in-editor rendering + browser preview ────────────
+  -- ── Markdown: Notion-like in-editor rendering + browser preview ──
   {
     "MeanderingProgrammer/render-markdown.nvim",
     ft = { "markdown" },
     dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
     opts = {
-      heading = { icons = { "󰲡 ", "󰲣 ", "󰲥 ", "󰲧 ", "󰲩 ", "󰲫 " } },
-      code = { style = "full", width = "block", left_pad = 1, right_pad = 2 },
+      heading = {
+        enabled = true,
+        sign = false,
+        icons = { "󰲡 ", "󰲣 ", "󰲥 ", "󰲧 ", "󰲩 ", "󰲫 " },
+        width = "full",
+        border = false,
+        backgrounds = {
+          "RenderMarkdownH1Bg",
+          "RenderMarkdownH2Bg",
+          "RenderMarkdownH3Bg",
+          "RenderMarkdownH4Bg",
+          "RenderMarkdownH5Bg",
+          "RenderMarkdownH6Bg",
+        },
+      },
+      code = {
+        style = "full",
+        width = "block",
+        left_pad = 2,
+        right_pad = 2,
+        border = "thin",
+        language_pad = 1,
+      },
       bullet = { icons = { "●", "○", "◆", "◇" } },
-      checkbox = { checked = { icon = "󰄲 " }, unchecked = { icon = "󰄱 " } },
+      checkbox = {
+        checked = { icon = "󰄲 ", scope_highlight = "@markup.strikethrough" },
+        unchecked = { icon = "󰄱 " },
+      },
+      quote = { icon = "▋" },
+      pipe_table = { style = "normal", cell = "padded" },
+      link = { enabled = true },
+      sign = { enabled = false },
       file_types = { "markdown" },
     },
   },

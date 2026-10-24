@@ -11,8 +11,19 @@ end
 local function dropdown(opts)
   return require("telescope.themes").get_dropdown(vim.tbl_deep_extend("force", {
     previewer = false,
-    layout_config = { width = 0.52, height = 0.40 },
+    layout_config = { width = 0.62, height = 0.45 },
   }, opts or {}))
+end
+
+local function is_loam()
+  return (vim.g.colors_name or "") == "loam"
+end
+
+local function merge_loam_telescope_opts(opts)
+  if not is_loam() then
+    return opts
+  end
+  return vim.tbl_deep_extend("force", opts, require("themes.loam.telescope").opts())
 end
 
 return {
@@ -42,6 +53,7 @@ return {
           telescope().buffers(dropdown({
             sort_mru = true,
             ignore_current_buffer = true,
+            path_display = { "smart" },
           }))
         end,
         desc = "Buffers",
@@ -73,24 +85,27 @@ return {
     },
     opts = function()
       local actions = require("telescope.actions")
-      return {
+      local base = {
         defaults = {
-          prompt_prefix = "  " .. icons.ui.search .. "  ",
-          selection_caret = "  ",
-          entry_prefix = "  ",
-          path_display = { "truncate" },
+          prompt_prefix = " ◇ ",
+          selection_caret = " ❯ ",
+          entry_prefix = "   ",
+          path_display = { "smart" },
           sorting_strategy = "ascending",
           layout_strategy = "horizontal",
+          borderchars = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
+          winblend = 0,
+          results_title = false,
           layout_config = {
             horizontal = {
               prompt_position = "top",
-              preview_width = 0.55,
+              preview_width = 0.58,
               width = 0.90,
-              height = 0.85,
+              height = 0.88,
             },
             center = {
-              width = 0.52,
-              height = 0.40,
+              width = 0.62,
+              height = 0.45,
             },
           },
           file_ignore_patterns = {
@@ -100,6 +115,7 @@ return {
             "dist/",
             "target/",
             "%.lock",
+            "%.DS_Store",
           },
           mappings = {
             i = {
@@ -108,6 +124,13 @@ return {
               ["<C-q>"] = actions.send_to_qflist + actions.open_qflist,
               ["<esc>"] = actions.close,
               ["<C-u>"] = false,
+              ["<C-d>"] = actions.preview_scrolling_down,
+              ["<C-f>"] = actions.preview_scrolling_up,
+            },
+            n = {
+              ["q"] = actions.close,
+              ["j"] = actions.move_selection_next,
+              ["k"] = actions.move_selection_previous,
             },
           },
         },
@@ -118,7 +141,8 @@ return {
             ignore_current_buffer = true,
             theme = "dropdown",
             previewer = false,
-            layout_config = { width = 0.52, height = 0.40 },
+            path_display = { "smart" },
+            layout_config = { width = 0.62, height = 0.45 },
             mappings = {
               i = { ["<C-d>"] = actions.delete_buffer },
             },
@@ -137,12 +161,33 @@ return {
           },
         },
       }
+      return merge_loam_telescope_opts(base)
     end,
     config = function(_, opts)
+      local base_opts = opts
+      opts = merge_loam_telescope_opts(opts)
       local telescope = require("telescope")
       telescope.setup(opts)
       pcall(telescope.load_extension, "fzf")
       pcall(telescope.load_extension, "ui-select")
+
+      local tel_group = vim.api.nvim_create_augroup("umbra_telescope_theme", { clear = true })
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = tel_group,
+        callback = function()
+          if vim.g.colors_name ~= "loam" then
+            return
+          end
+          local mod = require("themes.loam")
+          local p = mod.resolved or mod.base_palette
+          local tel = require("themes.loam.telescope")
+          tel.apply_highlights(p)
+          tel.apply_devicons(p)
+          pcall(function()
+            telescope.setup(merge_loam_telescope_opts(base_opts))
+          end)
+        end,
+      })
 
       -- After Telescope opens a file, guarantee syntax + LSP attach.
       local action_set = require("telescope.actions.set")
@@ -167,8 +212,6 @@ return {
       local keys = {
         { "<leader>ha", function() require("harpoon"):list():add() end, desc = "Harpoon add file" },
         { "<C-e>", function() local h = require("harpoon") h.ui:toggle_quick_menu(h:list()) end, desc = "Harpoon menu" },
-        { "<Tab>", function() require("harpoon"):list():next() end, desc = "Harpoon next" },
-        { "<S-Tab>", function() require("harpoon"):list():prev() end, desc = "Harpoon prev" },
         { "<leader>hn", function() require("harpoon"):list():next() end, desc = "Harpoon next" },
         { "<leader>hp", function() require("harpoon"):list():prev() end, desc = "Harpoon prev" },
       }

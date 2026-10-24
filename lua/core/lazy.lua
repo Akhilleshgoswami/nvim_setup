@@ -17,16 +17,16 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Paint the editor with our own theme before UI plugins load, so there is
--- never a flash of the default colorscheme.
-pcall(vim.cmd.colorscheme, "umbra")
+-- Paint Kiln first so there is never a flash of the default colorscheme;
+-- `features.theme` then restores Kiln (or the last pick).
+pcall(vim.cmd.colorscheme, "kiln")
 
 local ui = require("umbra.tokens")
 
 require("lazy").setup({
   spec = { { import = "plugins" } },
   defaults = { lazy = true },
-  install = { colorscheme = { "umbra" } },
+  install = { colorscheme = { "kiln", "solder", "loam", "meridian", "umbra", "catppuccin" } },
   checker = { enabled = true, notify = false, frequency = 86400 },
   change_detection = { enabled = true, notify = false },
   ui = {
@@ -52,8 +52,8 @@ require("lazy").setup({
 })
 
 -- Theme system: register `:Theme`/persistence, then restore the last-used
--- colorscheme (Umbra by default). Runs after setup so lazy can pull in the
--- saved theme's plugin on demand.
+-- colorscheme (Catppuccin Mocha by default). Runs after setup so lazy can pull
+-- in the saved theme's plugin on demand.
 local theme = require("features.theme")
 theme.setup()
 theme.load_saved()

@@ -47,6 +47,10 @@ map("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Shrink width" })
 map("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Grow width" })
 
 -- ── Buffers ─────────────────────────────────────────────────────
+map("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Prev buffer" })
+map("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next buffer" })
+map("n", "[b", "<cmd>bprevious<cr>", { desc = "Prev buffer" })
+map("n", "]b", "<cmd>bnext<cr>", { desc = "Next buffer" })
 map("n", "<leader>bd", function() require("utils").bufremove() end, { desc = "Delete buffer" })
 map("n", "<leader>bo", function() require("utils").delete_other_buffers() end, { desc = "Delete other buffers" })
 map("n", "<leader>bn", "<cmd>enew<cr>", { desc = "New buffer" })

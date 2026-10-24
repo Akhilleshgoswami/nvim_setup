@@ -43,13 +43,8 @@ return {
         ["<C-e>"] = { "cancel", "fallback" },
         ["<CR>"] = { "accept", "fallback" },
         ["<Tab>"] = {
-          function(cmp)
-            if cmp.snippet_active() then
-              return cmp.accept()
-            end
-            return cmp.select_and_accept()
-          end,
           "snippet_forward",
+          "select_and_accept",
           "fallback",
         },
         ["<S-Tab>"] = { "snippet_backward", "select_prev", "fallback" },
@@ -76,6 +71,7 @@ return {
           border = ui.border,
           winblend = ui.opacity.float,
           scrollbar = false,
+          max_height = 12,
           draw = {
             padding = ui.space.xs,
             gap = ui.space.xs,
@@ -83,7 +79,21 @@ return {
             columns = {
               { "kind_icon" },
               { "label", "label_description", gap = 1 },
+              { "kind" },
               { "source_name" },
+            },
+            components = {
+              kind_icon = {
+                text = function(ctx)
+                  return (ctx.kind_icon or "") .. (ctx.icon_gap or " ")
+                end,
+              },
+              source_name = {
+                text = function(ctx)
+                  return ctx.source_name and (" " .. ctx.source_name) or ""
+                end,
+                highlight = "BlinkCmpSource",
+              },
             },
           },
         },

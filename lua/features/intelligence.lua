@@ -50,15 +50,15 @@ local function skip_buf(buf)
   if ft == "" or SKIP_FT[ft] then
     return true
   end
-  -- Telescope preview/prompt buffers: treesitter + conceal_line crashes while
-  -- the preview reparses on every keystroke in find_files.
+  -- Telescope prompt/results: never attach TS (reparses every keystroke).
+  -- Preview is fine once conceallevel is 0 (see TelescopePreviewerLoaded).
   if ft == "TelescopePrompt" or ft == "TelescopeResults" then
     return true
   end
   for _, win in ipairs(vim.fn.win_findbuf(buf)) do
     if vim.api.nvim_win_is_valid(win) then
       local winhl = vim.wo[win].winhl or ""
-      if winhl:find("TelescopePreview") or winhl:find("TelescopePrompt") then
+      if winhl:find("TelescopePrompt") then
         return true
       end
     end
@@ -203,31 +203,46 @@ function M.setup()
     pattern = "TelescopeFindPre",
     callback = function()
       M.preload()
-      -- Tear down TS on preview buffers so conceal_line never runs there.
-      vim.schedule(function()
-        for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-          for _, win in ipairs(vim.fn.win_findbuf(buf)) do
-            if vim.api.nvim_win_is_valid(win) then
-              local winhl = vim.wo[win].winhl or ""
-              if winhl:find("TelescopePreview") then
-                pcall(vim.treesitter.stop, buf)
-              end
-            end
-          end
-        end
-      end)
     end,
   })
 
   vim.api.nvim_create_autocmd("User", {
     group = group,
     pattern = "TelescopePreviewerLoaded",
-    callback = function()
+    callback = function(args)
+      -- conceallevel=2 + treesitter conceal_line crashes in the preview as it
+      -- reparses; drop conceal and (re)attach highlight so the preview is lit.
+      local buf = args.buf
       vim.schedule(function()
-        for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if buf and vim.api.nvim_buf_is_valid(buf) then
           for _, win in ipairs(vim.fn.win_findbuf(buf)) do
-            if vim.api.nvim_win_is_valid(win) and (vim.wo[win].winhl or ""):find("TelescopePreview") then
-              pcall(vim.treesitter.stop, buf)
+            if vim.api.nvim_win_is_valid(win) then
+              vim.wo[win].conceallevel = 0
+              vim.wo[win].concealcursor = ""
+            end
+          end
+          pcall(vim.treesitter.stop, buf)
+          local ok, parsers = pcall(require, "nvim-treesitter.parsers")
+          if ok then
+            local lang = parsers.get_buf_lang(buf)
+            if lang and lang ~= "" then
+              pcall(vim.treesitter.start, buf, lang)
+            end
+          end
+          return
+        end
+        -- Fallback: fix every preview window (older telescope may not set args.buf).
+        for _, win in ipairs(vim.api.nvim_list_wins()) do
+          if vim.api.nvim_win_is_valid(win) and (vim.wo[win].winhl or ""):find("TelescopePreview") then
+            vim.wo[win].conceallevel = 0
+            local b = vim.api.nvim_win_get_buf(win)
+            pcall(vim.treesitter.stop, b)
+            local ok, parsers = pcall(require, "nvim-treesitter.parsers")
+            if ok then
+              local lang = parsers.get_buf_lang(b)
+              if lang and lang ~= "" then
+                pcall(vim.treesitter.start, b, lang)
+              end
             end
           end
         end

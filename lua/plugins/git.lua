@@ -111,14 +111,41 @@ return {
       { "<leader>gH", "<cmd>DiffviewFileHistory<cr>", desc = "Branch/project history" },
       { "<leader>gq", "<cmd>DiffviewToggleFiles<cr>", desc = "Toggle diff file panel" },
     },
-    opts = {
-      enhanced_diff_hl = true,
-      view = {
-        default = { winbar_info = true },
-        merge_tool = { layout = "diff3_mixed" },
-      },
-      file_panel = { win_config = { width = ui.panel.lg } },
-    },
+    opts = function()
+      local ui = require("umbra.tokens")
+      local base = {
+        enhanced_diff_hl = true,
+        view = {
+          default = { layout = "diff2_horizontal", winbar_info = true },
+          merge_tool = { layout = "diff3_horizontal" },
+        },
+        file_panel = {
+          listing_style = "tree",
+          win_config = { width = ui.panel.md },
+        },
+      }
+      if (vim.g.colors_name or "") == "loam" then
+        return vim.tbl_deep_extend("force", base, require("themes.loam.diffview").opts())
+      end
+      return base
+    end,
+    config = function(_, opts)
+      require("diffview").setup(opts)
+
+      local function apply_theme()
+        if vim.g.colors_name ~= "loam" then
+          return
+        end
+        local mod = require("themes.loam")
+        require("themes.loam.diffview").apply_highlights(mod.resolved or mod.base_palette)
+      end
+
+      apply_theme()
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("umbra_diffview_theme", { clear = true }),
+        callback = apply_theme,
+      })
+    end,
   },
 
   -- ── Full TUI (optional power tool) ─────────────────────────────

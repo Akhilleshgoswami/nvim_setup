@@ -1,5 +1,5 @@
 -- ╭──────────────────────────────────────────────────────────────╮
--- │  Umbra — a handcrafted Neovim environment                      │
+-- │  Umbra — a premium handcrafted Neovim IDE environment          │
 -- │  entry point: leaders → options → lazy → keymaps/autocmds      │
 -- ╰──────────────────────────────────────────────────────────────╯
 

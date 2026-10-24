@@ -1,9 +1,10 @@
 -- Runtime theme management: a picker (`:Theme`), persistence across restarts,
 -- and lazy-loading so alternate colorschemes never touch startup time.
 --
--- Umbra is the default. Any colorscheme you select is remembered in a small
--- state file and re-applied on the next launch. Because the theme plugins are
--- lazy (see plugins/themes.lua), we only load the one that's actually in use.
+-- Kiln is the default first-party theme. Any colorscheme you select is
+-- remembered in a small state file and re-applied on the next launch. Because
+-- the theme plugins are lazy (see plugins/themes.lua), we only load the one
+-- that's actually in use.
 
 local M = {}
 
@@ -22,6 +23,7 @@ M.theme_plugins = {
   "nightfox.nvim",
   "oxocarbon.nvim",
   "nord.nvim",
+  "luna.nvim",
 }
 
 -- Map a colorscheme name to the plugin that provides it, so we can lazy-load it
@@ -32,6 +34,7 @@ local exact = {
   gruvbox = "gruvbox.nvim",
   everforest = "everforest",
   oxocarbon = "oxocarbon.nvim",
+  luna = "luna.nvim",
   nightfox = "nightfox.nvim",
   dayfox = "nightfox.nvim",
   dawnfox = "nightfox.nvim",
@@ -51,7 +54,7 @@ local prefixes = {
 }
 
 local function plugin_for(name)
-  if not name or name == "" or name == "umbra" then
+  if not name or name == "" or name == "kiln" or name == "meridian" or name == "solder" or name == "loam" or name == "umbra" then
     return nil
   end
   if exact[name] then
@@ -97,19 +100,18 @@ function M.read()
   return (name and name ~= "") and name or nil
 end
 
--- Apply a colorscheme, lazy-loading its plugin first and falling back to Umbra
--- if the requested scheme isn't available.
+-- Apply a colorscheme, lazy-loading its plugin first and falling back to Kiln.
 function M.apply(name)
-  name = name or "umbra"
+  name = name or "kiln"
   load_plugin(name)
   if not pcall(vim.cmd.colorscheme, name) then
-    pcall(vim.cmd.colorscheme, "umbra")
+    pcall(vim.cmd.colorscheme, "kiln")
   end
 end
 
--- Restore the saved theme at startup (defaults to Umbra).
+-- Restore the saved theme at startup (defaults to Kiln).
 function M.load_saved()
-  M.apply(M.read() or "umbra")
+  M.apply(M.read() or "kiln")
 end
 
 -- Open the theme picker: load every alternate theme so it appears in the list,
@@ -172,7 +174,8 @@ M.recolor_dap = recolor_dap
 -- Umbra defines these explicitly; for other themes we link them to sensible
 -- built-ins (default = true means we never clobber a theme that defines them).
 function M.fix_custom_highlights()
-  if vim.g.colors_name == "umbra" then
+  local name = vim.g.colors_name
+  if name == "kiln" or name == "meridian" or name == "solder" or name == "loam" or name == "umbra" then
     return
   end
   local links = {
@@ -201,6 +204,9 @@ function M.setup()
       recolor_dap()
       pcall(function()
         require("features.wezterm").sync_theme_debounced()
+      end)
+      pcall(function()
+        require("themes.glyphs").apply(ev.match or vim.g.colors_name)
       end)
     end,
   })

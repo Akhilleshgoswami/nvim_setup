@@ -54,6 +54,10 @@ return {
     lock = "\u{f033e}", -- md-lock
     bookmark = "\u{f00c0}", -- md-bookmark
     lightbulb = "\u{f0335}", -- md-lightbulb
+    agent = "\u{f06a4}", -- md-robot
+    paperclip = "\u{f03e2}", -- md-paperclip
+    send = "\u{f005d}", -- md-arrow-up-circle
+    infinity = "\u{221e}",
     -- Powerline caps (statusline / winbar halves)
     left_half = "\u{e0b6}",
     right_half = "\u{e0b4}",

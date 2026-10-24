@@ -22,15 +22,19 @@ return {
       { "<leader>ge", "<cmd>Neotree focus left source=git_status<cr>", desc = "Explorer: git status" },
       { "<leader>be", "<cmd>Neotree focus left source=buffers<cr>", desc = "Explorer: buffers" },
     },
-    opts = {
+    opts = function()
+      local base = {
       close_if_last_window = true,
       popup_border_style = ui.border,
       enable_git_status = true,
       enable_diagnostics = true,
+      use_popups_for_input = true,
       sources = { "filesystem", "buffers", "git_status" },
       source_selector = {
         winbar = true,
         content_layout = "center",
+        tabs_layout = "equal",
+        separator = { left = "", right = "" },
         sources = {
           { source = "filesystem", display_name = " \u{f024b} Files " },
           { source = "buffers", display_name = " \u{f0219} Buffers " },
@@ -38,28 +42,30 @@ return {
         },
       },
       default_component_configs = {
+        container = { enable_character_fade = true },
         indent = {
+          indent_size = 2,
+          padding = 1,
           with_markers = true,
           indent_marker = icons.tree.indent,
           last_indent_marker = icons.tree.last,
           with_expanders = true,
           expander_collapsed = icons.ui.fold_closed,
           expander_expanded = icons.ui.fold_open,
+          expander_highlight = "NeoTreeExpander",
+        },
+        icon = {
+          folder_closed = "󰉋",
+          folder_open = "󰝰",
+          folder_empty = "󰉖",
+          folder_empty_open = "󰷏",
+          default = "󰈔",
         },
         modified = { symbol = icons.ui.modified },
-        -- VS Code-style letter badges (colored by the theme's NeoTreeGit* groups).
+        name = { trailing_slash = false, use_git_status_colors = true },
+        -- Git status glyphs follow the active built-in theme (see themes/glyphs.lua).
         git_status = {
-          symbols = {
-            added = "A",
-            modified = "M",
-            deleted = "D",
-            renamed = "R",
-            untracked = "U",
-            ignored = "!",
-            unstaged = "",
-            staged = "",
-            conflict = "C",
-          },
+          symbols = require("themes.glyphs").neo_tree_git(),
         },
         diagnostics = {
           symbols = {
@@ -71,16 +77,17 @@ return {
         },
       },
       window = {
+        position = "left",
         width = ui.panel.md,
+        mapping_options = { noremap = true, nowait = true },
         mappings = {
           ["<space>"] = "none",
           ["l"] = "open",
           ["h"] = "close_node",
-          ["P"] = { "toggle_preview", config = { use_float = true, use_image_nvim = false } },
+          ["P"] = { "toggle_preview", config = { use_float = true, use_image_nvim = true } },
           ["<cr>"] = "open",
           ["s"] = "open_vsplit",
           ["S"] = "open_split",
-          -- Cycle Files → Buffers → Git in place, so one sidebar serves all.
           ["<Tab>"] = "next_source",
           ["<S-Tab>"] = "prev_source",
           ["Y"] = function(state)
@@ -91,26 +98,31 @@ return {
           end,
         },
       },
+      -- Floating explorer: rounded, compact, preview-ready.
       filesystem = {
         bind_to_cwd = false,
-        follow_current_file = { enabled = true },
+        follow_current_file = { enabled = true, leave_dirs_open = false },
         use_libuv_file_watcher = true,
         group_empty_dirs = true,
+        hijack_netrw_behavior = "disabled",
         window = {
           mappings = {
-            ["H"] = "toggle_hidden", -- filesystem-only; avoids warnings in other sources
+            ["H"] = "toggle_hidden",
           },
         },
         filtered_items = {
           visible = false,
           hide_dotfiles = false,
           hide_gitignored = true,
-          hide_by_name = { ".git", "node_modules", ".DS_Store" },
-          never_show = { ".DS_Store" },
+          hide_by_name = { ".git", "node_modules", ".DS_Store", ".cache" },
+          never_show = { ".DS_Store", "thumbs.db" },
         },
       },
-      -- Full git workflow from the sidebar: stage/unstage/revert files and
-      -- commit/push — no need to leave the editor. (Enter/l opens the diff.)
+      buffers = {
+        follow_current_file = { enabled = true },
+        group_empty_dirs = true,
+        show_unloaded = true,
+      },
       git_status = {
         window = {
           mappings = {
@@ -136,13 +148,13 @@ return {
           end,
         },
       },
-    },
+      }
+      return require("features.neotree_diffstat").configure(base)
+    end,
     config = function(_, opts)
       require("neo-tree").setup(opts)
+      require("features.neotree_diffstat").setup_autocmd()
 
-      -- Keep git badges fresh after writes / staging / focus — but only when a
-      -- neo-tree git view is actually loaded, so this never breaks lazy-loading.
-      -- (neo-tree's file watcher already handles most cases; this covers the rest.)
       vim.api.nvim_create_autocmd({ "BufWritePost", "FocusGained", "TermClose", "TermLeave" }, {
         group = vim.api.nvim_create_augroup("umbra_neotree_git", { clear = true }),
         callback = function()

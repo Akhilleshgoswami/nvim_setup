@@ -1,14 +1,14 @@
 # Umbra
 
-A premium, handcrafted dark Neovim colorscheme inspired by Linear, Vercel, Raycast, and Stripe Dashboard. Graphite surfaces, soft contrast, desaturated accents — comfortable for long coding sessions and OLED-friendly.
+A premium, handcrafted dark Neovim colorscheme inspired by Cursor, Zed, Linear, Warp, Raycast, and GitHub Dark Modern. Soft blue-gray surfaces, warm accents, desaturated syntax — comfortable for long sessions on 13–14" displays.
 
 ## Features
 
 - Modular architecture (palette, groups, treesitter, LSP, plugins, terminal)
-- Full Treesitter support for Lua, TypeScript, JavaScript, JSX/TSX, HTML, CSS, JSON, YAML, Markdown, SQL, Bash, Rust, Go, Python, and more
-- Complete LSP semantic highlights and diagnostics
-- Git integration (GitSigns, Diffview, Fugitive, Neogit)
-- 30+ plugin integrations (Telescope, Neo-tree, blink.cmp, Noice, Which-Key, Flash, Trouble, Mason, Lazy, Render Markdown, and others)
+- Full Treesitter + semantic LSP highlighting (keywords, functions, types, classes, interfaces, enums, decorators…)
+- Soft diagnostics (undercurl), muted rainbow delimiters
+- Git integration (GitSigns, Diffview, Neogit, LazyGit)
+- 30+ plugin integrations (Telescope, Neo-tree, Bufferline, blink.cmp, Noice, Which-Key, Flash, Trouble, Mason, Lazy, Render Markdown, and others)
 - 16-color terminal palette
 - Configurable: transparency, dim inactive windows, italic comments, bold keywords, custom overrides
 
