@@ -32,9 +32,9 @@ mv ~/.config/nvim ~/.config/nvim.backup 2>/dev/null
 mv ~/.local/share/nvim ~/.local/share/nvim.backup 2>/dev/null
 
 # 2. Clone the repository
-git clone git@github.com:Akhilleshgoswami/nvim_setup.git ~/.config/nvim
+git clone -b navchand git@github.com:Akhilleshgoswami/nvim_setup.git ~/.config/nvim
 # Or using HTTPS:
-# git clone https://github.com/Akhilleshgoswami/nvim_setup.git ~/.config/nvim
+# git clone -b navchand https://github.com/Akhilleshgoswami/nvim_setup.git ~/.config/nvim
 
 # 3. Launch Neovim
 nvim
@@ -44,7 +44,7 @@ nvim
 
 ```powershell
 # 1. Clone repository to Neovim config directory
-git clone https://github.com/Akhilleshgoswami/nvim_setup.git $env:LOCALAPPDATA\nvim
+git clone -b navchand https://github.com/Akhilleshgoswami/nvim_setup.git $env:LOCALAPPDATA\nvim
 
 # 2. Launch Neovim
 nvim
