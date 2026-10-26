@@ -82,9 +82,9 @@ return {
     end
 
     dashboard.section.buttons.val = {
-      dashboard.button("f", "󰈞  Find file", function() require("telescope.builtin").find_files({ hidden = true }) end),
-      dashboard.button("g", "󰊄  Live grep", function() require("telescope.builtin").live_grep() end),
-      dashboard.button("r", "󰋚  Recent files", function() require("telescope.builtin").oldfiles() end),
+      dashboard.button("f", "󰈞  Find file", function() require("telescope.builtin").find_files({ hidden = true, cwd = vim.fn.getcwd() }) end),
+      dashboard.button("g", "󰊄  Live grep", function() require("telescope.builtin").live_grep({ cwd = vim.fn.getcwd() }) end),
+      dashboard.button("r", "󰋚  Recent files", function() require("telescope.builtin").oldfiles({ cwd_only = true }) end),
       dashboard.button("p", "󰉋  Projects", function()
         pcall(require("telescope").extensions.projects.projects, {})
       end),

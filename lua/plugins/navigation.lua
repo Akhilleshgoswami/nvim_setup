@@ -42,23 +42,25 @@ return {
       "nvim-telescope/telescope-ui-select.nvim",
     },
     keys = {
-      { "<leader><leader>", function() telescope().find_files({ hidden = true }) end, desc = "Find files" },
-      { "<leader>ff", function() telescope().find_files({ hidden = true }) end, desc = "Find files" },
-      { "<leader>fF", function() telescope().find_files({ hidden = true, no_ignore = true }) end, desc = "Find all files" },
-      { "<leader>fg", function() telescope().live_grep() end, desc = "Live grep" },
-      { "<leader>fw", function() telescope().grep_string() end, desc = "Grep word", mode = { "n", "v" } },
+      { "<leader><leader>", function() telescope().find_files({ hidden = true, cwd = vim.fn.getcwd() }) end, desc = "Find files" },
+      { "<leader>ff", function() telescope().find_files({ hidden = true, cwd = vim.fn.getcwd() }) end, desc = "Find files" },
+      { "<leader>fF", function() telescope().find_files({ hidden = true, no_ignore = true, cwd = vim.fn.getcwd() }) end, desc = "Find all files" },
+      { "<leader>f.", function() telescope().find_files({ hidden = true, cwd = vim.fn.expand("%:p:h") }) end, desc = "Find files (current file folder)" },
+      { "<leader>fg", function() telescope().live_grep({ cwd = vim.fn.getcwd() }) end, desc = "Live grep" },
+      { "<leader>fw", function() telescope().grep_string({ cwd = vim.fn.getcwd() }) end, desc = "Grep word", mode = { "n", "v" } },
       {
         "<leader>fb",
         function()
           telescope().buffers(dropdown({
             sort_mru = true,
             ignore_current_buffer = true,
+            cwd_only = true,
             path_display = { "smart" },
           }))
         end,
         desc = "Buffers",
       },
-      { "<leader>fr", function() telescope().oldfiles() end, desc = "Recent files" },
+      { "<leader>fr", function() telescope().oldfiles({ cwd_only = true }) end, desc = "Recent files" },
       { "<leader>fh", function() telescope().help_tags(dropdown()) end, desc = "Help tags" },
       { "<leader>fk", function() telescope().keymaps(dropdown()) end, desc = "Keymaps" },
       { "<leader>fc", function() telescope().commands(dropdown()) end, desc = "Commands" },
@@ -139,6 +141,7 @@ return {
           buffers = {
             sort_mru = true,
             ignore_current_buffer = true,
+            cwd_only = true,
             theme = "dropdown",
             previewer = false,
             path_display = { "smart" },
@@ -293,8 +296,10 @@ return {
     "ahmedkhalf/project.nvim",
     main = "project_nvim",
     opts = {
+      manual_mode = true, -- Never change directory automatically on buffer open
       detection_methods = { "lsp", "pattern" },
       patterns = { ".git", "package.json", "go.mod", "Cargo.toml", "pyproject.toml", "Makefile", ".root" },
+      exclude_dirs = { "~/*", "~/Desktop", "/Users/akhileshgoswami", "/Users/akhileshgoswami/Desktop" },
       silent_chdir = true,
       scope_chdir = "global",
     },

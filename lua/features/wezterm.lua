@@ -136,6 +136,12 @@ local THEME_BACKGROUNDS = {
   nord = "#2e3440",
   oxocarbon = "#161616",
   luna = "#0f141c",
+  ["jetbrains-dark"] = "#191a1c",
+  ["jetbrains-light"] = "#ffffff",
+  ["jetbrains-white"] = "#ffffff",
+  ["jb-dark"] = "#191a1c",
+  ["jb-light"] = "#ffffff",
+  jb = "#191a1c",
 }
 
 local function get_theme_bg(name)

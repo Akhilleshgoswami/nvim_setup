@@ -24,6 +24,7 @@ M.theme_plugins = {
   "oxocarbon.nvim",
   "nord.nvim",
   "luna.nvim",
+  "jb.nvim",
 }
 
 -- Map a colorscheme name to the plugin that provides it, so we can lazy-load it
@@ -42,6 +43,12 @@ local exact = {
   nordfox = "nightfox.nvim",
   terafox = "nightfox.nvim",
   carbonfox = "nightfox.nvim",
+  jb = "jb.nvim",
+  ["jb-dark"] = "jb.nvim",
+  ["jb-light"] = "jb.nvim",
+  ["jetbrains-dark"] = "jb.nvim",
+  ["jetbrains-light"] = "jb.nvim",
+  ["jetbrains-white"] = "jb.nvim",
 }
 
 local prefixes = {
@@ -51,6 +58,8 @@ local prefixes = {
   { "rose%-pine", "rose-pine" },
   { "onedark", "onedarkpro.nvim" },
   { "onelight", "onedarkpro.nvim" },
+  { "jb", "jb.nvim" },
+  { "jetbrains", "jb.nvim" },
 }
 
 local function plugin_for(name)

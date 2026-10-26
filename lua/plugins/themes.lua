@@ -80,4 +80,10 @@ return {
   theme({ "gbprod/nord.nvim", opts = {} }),
 
   theme({ "wtfox/luna.nvim", opts = {} }),
+
+  theme({
+    "nickkadutskyi/jb.nvim",
+    name = "jb.nvim",
+    opts = {},
+  }),
 }

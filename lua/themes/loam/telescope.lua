@@ -64,6 +64,7 @@ function M.opts()
     },
     pickers = {
       find_files = { theme = "ivy", hidden = true },
+      buffers = { cwd_only = true },
     },
   }
 end
