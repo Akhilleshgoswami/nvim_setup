@@ -60,11 +60,25 @@ Neovim and WezTerm are linked so that switching colorschemes in Neovim immediate
 - **Why**: Neocursor inserted multi-line inline diff predictions, strike-through virtual text (`《neocursor · <Tab> jump`), and hijacked `<Tab>` presses, interrupting typing flow.
 - **Result**: You retain clean, standard, predictable code completion without disruptive text rewrites or jumped cursors.
 
-### Standard Keybindings
+### GitHub Copilot Native Auto Suggestions
+
+- **Automatic Inline Predictions**: Ghost-text code suggestions powered by `zbirenbaum/copilot.lua` trigger automatically as you type.
+- **Smart Menu Coordination**: Auto-suggestions politely hide (`hide_during_completion = true`) whenever the `blink.cmp` popup menu opens, avoiding UI collision.
+- **Unified `<Tab>` Flow**: When Copilot ghost text is visible, `<Tab>` immediately accepts the Copilot suggestion. When `blink.cmp`'s menu is open, `<Tab>` accepts the dropdown completion.
+
+### Keybindings
 
 | Key | Mode | Description |
 | --- | --- | --- |
-| `<Tab>` | Insert | Accept selected completion / jump to next snippet placeholder / indent |
+| `<Tab>` | Insert | Accept Copilot suggestion (if visible) / accept completion / snippet jump / indent |
+| `<M-l>` or `<C-l>` | Insert | Accept full Copilot suggestion |
+| `<M-w>` | Insert | Accept next word of Copilot suggestion |
+| `<M-j>` | Insert | Accept next line of Copilot suggestion |
+| `<M-]>` / `<M-[>` | Insert | Cycle next / previous Copilot suggestion |
+| `<C-]>` | Insert | Dismiss Copilot suggestion |
+| `<leader>ap` | Normal | Toggle Copilot auto-trigger ON / OFF |
+| `<leader>as` | Normal | Check Copilot status (`:Copilot status`) |
+| `<leader>aa` | Normal | Sign in / authenticate with Copilot (`:Copilot auth`) |
 | `<S-Tab>` | Insert | Select previous completion item / jump to previous snippet placeholder |
 | `<CR>` | Insert | Accept completion item |
 | `<C-space>` | Insert | Manually trigger completion menu / toggle documentation |

@@ -43,6 +43,12 @@ return {
         ["<C-e>"] = { "cancel", "fallback" },
         ["<CR>"] = { "accept", "fallback" },
         ["<Tab>"] = {
+          function(cmp)
+            if package.loaded["copilot.suggestion"] and require("copilot.suggestion").is_visible() then
+              require("copilot.suggestion").accept()
+              return true
+            end
+          end,
           "snippet_forward",
           "select_and_accept",
           "fallback",

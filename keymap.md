@@ -247,17 +247,25 @@ Add or remove a theme by editing `lua/plugins/themes.lua` (the statusline
 adapts automatically). Variants like `catppuccin-mocha` or `tokyonight-moon`
 are selectable directly from the picker.
 
-## Completion (blink.cmp — insert mode)
+## Completion & GitHub Copilot (insert & normal mode)
 
-| Key | Action |
-|---|---|
-| `Tab` | Accept / jump snippet forward |
-| `Shift-Tab` | Prev item / jump snippet back |
-| `Enter` | Accept |
-| `Ctrl-Space` | Toggle documentation |
-| `Ctrl-n` / `Ctrl-p` | Next / previous item |
-| `Ctrl-f` / `Ctrl-b` | Scroll docs |
-| `Ctrl-e` | Cancel |
+| Key | Mode | Action |
+|---|---|---|
+| `Tab` | Insert | Accept Copilot suggestion (when visible) / accept completion / snippet jump / indent |
+| `Alt-l` / `Ctrl-l` | Insert | Accept full Copilot inline suggestion |
+| `Alt-w` | Insert | Accept next word of Copilot suggestion |
+| `Alt-j` | Insert | Accept next line of Copilot suggestion |
+| `Alt-]` / `Alt-[` | Insert | Cycle next / previous Copilot suggestion |
+| `Ctrl-]` | Insert | Dismiss Copilot suggestion |
+| `Space ap` | Normal | Toggle Copilot auto-suggestions ON / OFF |
+| `Space as` | Normal | Check Copilot status (`:Copilot status`) |
+| `Space aa` | Normal | Sign in / authenticate with Copilot (`:Copilot auth`) |
+| `Shift-Tab` | Insert | Prev item / jump snippet back |
+| `Enter` | Insert | Accept completion item |
+| `Ctrl-Space` | Insert | Toggle documentation |
+| `Ctrl-n` / `Ctrl-p` | Insert | Next / previous item |
+| `Ctrl-f` / `Ctrl-b` | Insert | Scroll docs |
+| `Ctrl-e` | Insert | Cancel completion menu |
 
 ## Misc
 

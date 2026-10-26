@@ -7,6 +7,65 @@
 local ui = require("umbra.tokens")
 
 return {
+  -- ── GitHub Copilot: Native inline ghost-text auto suggestions ───
+  {
+    "zbirenbaum/copilot.lua",
+    cmd = "Copilot",
+    event = "InsertEnter",
+    opts = {
+      suggestion = {
+        enabled = true,
+        auto_trigger = true,
+        hide_during_completion = true,
+        debounce = 75,
+        keymap = {
+          accept = "<M-l>",
+          accept_word = "<M-w>",
+          accept_line = "<M-j>",
+          next = "<M-]>",
+          prev = "<M-[",
+          dismiss = "<C-]>",
+        },
+      },
+      panel = { enabled = false },
+      filetypes = {
+        markdown = true,
+        help = false,
+        gitcommit = true,
+        gitrebase = false,
+        hgcommit = false,
+        svn = false,
+        cvs = false,
+        ["."] = false,
+      },
+      copilot_node_command = "node",
+    },
+    keys = {
+      {
+        "<leader>ap",
+        function()
+          local s = require("copilot.suggestion")
+          s.toggle_auto_trigger()
+          local state = vim.b.copilot_suggestion_auto_trigger
+          vim.notify("Copilot auto-trigger: " .. (state and "ON" or "OFF"), vim.log.levels.INFO, { title = "Copilot" })
+        end,
+        desc = "Copilot: toggle auto-trigger",
+      },
+      { "<leader>as", "<cmd>Copilot status<cr>", desc = "Copilot: status" },
+      { "<leader>aa", "<cmd>Copilot auth<cr>", desc = "Copilot: auth sign-in" },
+    },
+    config = function(_, opts)
+      require("copilot").setup(opts)
+      vim.keymap.set("i", "<C-l>", function()
+        if require("copilot.suggestion").is_visible() then
+          require("copilot.suggestion").accept()
+        else
+          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Right>", true, false, true), "n", false)
+        end
+      end, { desc = "Copilot: accept suggestion" })
+    end,
+  },
+
   -- ── Neocursor: Predictive jump completion (disabled) ────────────
   {
     "teocns/neocursor.nvim",
