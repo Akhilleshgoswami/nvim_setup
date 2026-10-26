@@ -116,13 +116,16 @@ The configuration uses a unified `<Tab>` workflow where Copilot and `blink.cmp` 
 
 Leader key is **`Space`**.
 
-### Navigation & Fuzzy Search
+### Navigation & Fuzzy Search (Optimized & Fast)
 - `<Space><Space>` or `<Space>ff` — Find files (Telescope)
 - `<Space>fg` — Live grep (search across files)
 - `<Space>fb` — Open buffers
 - `<Space>fr` — Recent files
 - `<Space>e` — Toggle File Explorer sidebar (`neo-tree`)
 - `-` — Open floating file editor (`oil.nvim`)
+
+> [!TIP]
+> **Instant Performance**: Telescope and Neo-tree are hard-coded to ignore `node_modules/`, `.venv/`, `venv/`, `__pycache__/`, and build caches directly at the `ripgrep` filesystem level. Searches remain instant with zero lag even in massive monorepos.
 
 ### Themes & Real-Time WezTerm Sync
 - `:Theme` or `<Space>ut` — Open theme selector with instant live preview.

@@ -87,6 +87,17 @@ Neovim and WezTerm are linked so that switching colorschemes in Neovim immediate
 
 ---
 
+### Blazing Fast Search (Excluded Dependencies)
+
+Telescope (`find_files`, `live_grep`, `grep_string`) and Neo-tree are configured with low-level `ripgrep` exclusion globs and `file_ignore_patterns`:
+- **Node.js**: `node_modules/`, `.next/`, `.nuxt/`, `.turbo/`, `.yarn/`, lock files.
+- **Python**: `.venv/`, `venv/`, `env/`, `__pycache__/`, `.pytest_cache/`, `.mypy_cache/`, `.ruff_cache/`, `.tox/`, `site-packages/`, `*.egg-info/`.
+- **Builds**: `dist/`, `build/`, `target/`, `out/`, `coverage/`.
+
+This prevents thousands of dependency files from flooding search results or freezing Neovim's Lua thread.
+
+---
+
 ## 3. Code Folding
 
 Code folding is driven by `kevinhwang91/nvim-ufo` combined with Treesitter and LSP folding ranges.

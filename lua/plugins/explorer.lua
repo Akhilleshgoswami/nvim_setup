@@ -114,7 +114,7 @@ return {
           visible = false,
           hide_dotfiles = false,
           hide_gitignored = true,
-          hide_by_name = { ".git", "node_modules", ".DS_Store", ".cache" },
+          hide_by_name = { ".git", "node_modules", ".venv", "venv", "env", ".env", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", ".tox", ".DS_Store", ".cache" },
           never_show = { ".DS_Store", "thumbs.db" },
         },
       },

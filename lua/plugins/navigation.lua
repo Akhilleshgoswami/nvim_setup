@@ -26,6 +26,110 @@ local function merge_loam_telescope_opts(opts)
   return vim.tbl_deep_extend("force", opts, require("themes.loam.telescope").opts())
 end
 
+local ignore_globs = {
+  "!**/.git/*",
+  "!**/node_modules/*",
+  "!**/.venv/*",
+  "!**/venv/*",
+  "!**/env/*",
+  "!**/.env/*",
+  "!**/__pycache__/*",
+  "!**/.pytest_cache/*",
+  "!**/.mypy_cache/*",
+  "!**/.ruff_cache/*",
+  "!**/.tox/*",
+  "!**/.nox/*",
+  "!**/site-packages/*",
+  "!**/*.egg-info/*",
+  "!**/.ipynb_checkpoints/*",
+  "!**/dist/*",
+  "!**/build/*",
+  "!**/target/*",
+  "!**/out/*",
+  "!**/.next/*",
+  "!**/.nuxt/*",
+  "!**/.turbo/*",
+  "!**/.yarn/*",
+  "!**/.cache/*",
+  "!**/coverage/*",
+  "!**/htmlcov/*",
+}
+
+local function rg_find_command()
+  local cmd = { "rg", "--files", "--hidden" }
+  for _, glob in ipairs(ignore_globs) do
+    table.insert(cmd, "--glob")
+    table.insert(cmd, glob)
+  end
+  return cmd
+end
+
+local function rg_vimgrep_arguments()
+  local args = {
+    "rg",
+    "--color=never",
+    "--no-heading",
+    "--with-filename",
+    "--line-number",
+    "--column",
+    "--smart-case",
+    "--hidden",
+  }
+  for _, glob in ipairs(ignore_globs) do
+    table.insert(args, "--glob")
+    table.insert(args, glob)
+  end
+  return args
+end
+
+local file_ignore_patterns = {
+  -- Version control
+  "%.git/",
+  "%.git$",
+  -- Node & JavaScript dependencies and caches
+  "node_modules/",
+  "node_modules",
+  "%.next/",
+  "%.nuxt/",
+  "%.turbo/",
+  "%.yarn/",
+  "%.pnpm%-store/",
+  -- Python virtual environments, caches, and bytecode
+  "%.venv/",
+  "%.venv$",
+  "^venv/",
+  "/venv/",
+  "^env/",
+  "/env/",
+  "__pycache__/",
+  "__pycache__",
+  "%.pytest_cache/",
+  "%.mypy_cache/",
+  "%.ruff_cache/",
+  "%.tox/",
+  "%.nox/",
+  "site%-packages/",
+  "site%-packages",
+  "%.egg%-info/",
+  "%.ipynb_checkpoints/",
+  -- Build outputs & general caches
+  "dist/",
+  "build/",
+  "target/",
+  "out/",
+  "coverage/",
+  "htmlcov/",
+  "%.cache/",
+  -- Lock files and artifacts
+  "package%-lock%.json",
+  "yarn%.lock",
+  "pnpm%-lock%.yaml",
+  "%.lock$",
+  "%.pyc$",
+  "%.pyo$",
+  "%.DS_Store",
+}
+
 return {
   -- ── Telescope ──────────────────────────────────────────────────
   {
@@ -42,12 +146,72 @@ return {
       "nvim-telescope/telescope-ui-select.nvim",
     },
     keys = {
-      { "<leader><leader>", function() telescope().find_files({ hidden = true, cwd = vim.fn.getcwd() }) end, desc = "Find files" },
-      { "<leader>ff", function() telescope().find_files({ hidden = true, cwd = vim.fn.getcwd() }) end, desc = "Find files" },
-      { "<leader>fF", function() telescope().find_files({ hidden = true, no_ignore = true, cwd = vim.fn.getcwd() }) end, desc = "Find all files" },
-      { "<leader>f.", function() telescope().find_files({ hidden = true, cwd = vim.fn.expand("%:p:h") }) end, desc = "Find files (current file folder)" },
-      { "<leader>fg", function() telescope().live_grep({ cwd = vim.fn.getcwd() }) end, desc = "Live grep" },
-      { "<leader>fw", function() telescope().grep_string({ cwd = vim.fn.getcwd() }) end, desc = "Grep word", mode = { "n", "v" } },
+      {
+        "<leader><leader>",
+        function()
+          telescope().find_files({
+            hidden = true,
+            cwd = vim.fn.getcwd(),
+            find_command = rg_find_command(),
+          })
+        end,
+        desc = "Find files",
+      },
+      {
+        "<leader>ff",
+        function()
+          telescope().find_files({
+            hidden = true,
+            cwd = vim.fn.getcwd(),
+            find_command = rg_find_command(),
+          })
+        end,
+        desc = "Find files",
+      },
+      {
+        "<leader>fF",
+        function()
+          telescope().find_files({
+            hidden = true,
+            no_ignore = true,
+            cwd = vim.fn.getcwd(),
+            find_command = rg_find_command(),
+          })
+        end,
+        desc = "Find all files",
+      },
+      {
+        "<leader>f.",
+        function()
+          telescope().find_files({
+            hidden = true,
+            cwd = vim.fn.expand("%:p:h"),
+            find_command = rg_find_command(),
+          })
+        end,
+        desc = "Find files (current file folder)",
+      },
+      {
+        "<leader>fg",
+        function()
+          telescope().live_grep({
+            cwd = vim.fn.getcwd(),
+            vimgrep_arguments = rg_vimgrep_arguments(),
+          })
+        end,
+        desc = "Live grep",
+      },
+      {
+        "<leader>fw",
+        function()
+          telescope().grep_string({
+            cwd = vim.fn.getcwd(),
+            vimgrep_arguments = rg_vimgrep_arguments(),
+          })
+        end,
+        desc = "Grep word",
+        mode = { "n", "v" },
+      },
       {
         "<leader>fb",
         function()
@@ -89,6 +253,7 @@ return {
       local actions = require("telescope.actions")
       local base = {
         defaults = {
+          vimgrep_arguments = rg_vimgrep_arguments(),
           prompt_prefix = " ◇ ",
           selection_caret = " ❯ ",
           entry_prefix = "   ",
@@ -110,15 +275,7 @@ return {
               height = 0.45,
             },
           },
-          file_ignore_patterns = {
-            "%.git/",
-            "node_modules/",
-            "%.next/",
-            "dist/",
-            "target/",
-            "%.lock",
-            "%.DS_Store",
-          },
+          file_ignore_patterns = file_ignore_patterns,
           mappings = {
             i = {
               ["<C-j>"] = actions.move_selection_next,
@@ -137,7 +294,13 @@ return {
           },
         },
         pickers = {
-          find_files = { hidden = true },
+          find_files = {
+            hidden = true,
+            find_command = rg_find_command(),
+          },
+          live_grep = {
+            vimgrep_arguments = rg_vimgrep_arguments(),
+          },
           buffers = {
             sort_mru = true,
             ignore_current_buffer = true,
